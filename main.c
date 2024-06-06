@@ -1,12 +1,12 @@
 #include<stdlib.h>
 #include<stdio.h>
+#include<stdbool.h>
 
 #include<allegro5/allegro.h>
 #include<allegro5/allegro_font.h>
 #include<allegro5/allegro_primitives.h>
 
 #include"player.h"
-#include"controle.h"
 
 int main(){
 	//inicializa os componentos do allegro
@@ -39,51 +39,28 @@ int main(){
 	//codigo do evento atual
 	int code;
 
-	//roda até que o programa seja encerrado
-	while(1){
-		//aguarda e obtem o proximo evento, assim como seu codigo
-		al_wait_for_event(queue, &event);
-		code = event.type;
+	bool pressed_keys[ALLEGRO_KEY_MAX] = {false};
 
-		if(code == 30){
-			al_clear_to_color(al_map_rgb(0,0,0));
-			al_draw_filled_rectangle(player_1->x-player_1->side/2, player_1->y-player_1->side/2, player_1->x+player_1->side/2, player_1->y+player_1->side/2, al_map_rgb(255,0,0));
-			al_draw_filled_rectangle(player_2->x-player_2->side/2, player_2->y-player_2->side/2, player_2->x+player_2->side/2, player_2->y+player_2->side/2, al_map_rgb(0,0,255));
-			al_flip_display();
-		
-		} else if (code == 10 || code == 12){
-			int key = event.keyboard.keycode;
-			switch(key){
-				case(1):
-					flip_left(player_1->control);
-				break;
-				case(19):
-					flip_down(player_1->control);
-				break;
-				case(4):
-					flip_right(player_1->control);
-				break;
-				case(23):
-					flip_up(player_1->control);
-				break;
-				case(82):
-					flip_left(player_2->control);
-				break;
-				case(85):
-					flip_down(player_2->control);
-				break;
-				case(83):
-					flip_right(player_2->control);
-				break;
-				case(84):
-					flip_up(player_2->control);
-				break;
-				default:
-				break;
-			}
-		} else if(code == 42)
-			break;
-		move_players(player_1, player_2, 640, 640);
+	bool encerra = false;
+
+	//roda até que o programa seja encerrado
+	while(!encerra){
+		while(!al_is_event_queue_empty(queue)){
+			//aguarda e obtem o proximo evento, assim como seu codigo
+			al_wait_for_event(queue, &event);
+			code = event.type;
+
+			if(code == 30){
+				move_players(player_1, player_2, 640, 640, pressed_keys);
+				al_clear_to_color(al_map_rgb(0,0,0));
+				al_draw_filled_rectangle(player_1->x-player_1->side/2, player_1->y-player_1->side/2, player_1->x+player_1->side/2, player_1->y+player_1->side/2, al_map_rgb(255,0,0));
+				al_draw_filled_rectangle(player_2->x-player_2->side/2, player_2->y-player_2->side/2, player_2->x+player_2->side/2, player_2->y+player_2->side/2, al_map_rgb(0,0,255));
+				al_flip_display();
+			} else if(code == 10 || code == 12){
+			       pressed_keys[event.keyboard.keycode] = pressed_keys[event.keyboard.keycode] ^ 1;	
+			} else if(code == 42)
+				encerra = true;
+		}		
 	}
 
 	//destroi os jogadores e seus componentes

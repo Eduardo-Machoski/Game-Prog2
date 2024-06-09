@@ -1,4 +1,5 @@
-controle.o
+gui.o
+display.o
 player.o
 main.o
 game

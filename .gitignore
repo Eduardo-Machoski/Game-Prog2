@@ -2,4 +2,12 @@ gui.o
 display.o
 player.o
 main.o
+.gui.c.swp
+.display.c.swp
+.player.c.swp
+.main.c.swp
+.gui.h.swp
+.display.h.swp
+.player.h.swp
+.main.h.swp
 game

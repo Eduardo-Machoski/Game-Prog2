@@ -22,7 +22,7 @@ int main(){
 	ALLEGRO_FONT* font = al_create_builtin_font();
 
 	//cria o display e armazena suas informacoes
-	display_info *disp = cria_display(640, 640);
+	display_info *disp = cria_display();
 
 	//regista os eventos que serao colocados na queue
 	al_register_event_source(queue, al_get_keyboard_event_source());
@@ -35,8 +35,8 @@ int main(){
 
 
 	//cria amobos os players
-	player *player_1 = cria_player(25, 20, 50);
-	player *player_2 = cria_player(25, 100, 50);
+	player *player_1 = cria_player(disp, 10);
+	player *player_2 = cria_player(disp, 90);
 
 	//evento atual sendo lidado no loop
 	ALLEGRO_EVENT event;
@@ -64,6 +64,9 @@ int main(){
 			al_flip_display();
 		} else if(code == 10 || code == 12){ //tecla pressionada
 			pressed_keys[event.keyboard.keycode] = pressed_keys[event.keyboard.keycode] ^ 1;
+
+			//printf("%d", event.keyboard.keycode);
+
 			//pressiona 'f11' para obter tela full-screen
 			if(event.keyboard.keycode == 57 && code == 10){
 				al_unregister_event_source(queue, al_get_display_event_source(disp->disp));

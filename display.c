@@ -1,21 +1,37 @@
 #include"display.h"
 
 //cria um novo display de tamanha tam_x x tam_y e armazena suas informacoes na estrutura display_info
-display_info *cria_display(int tam_x, int tam_y){
+display_info *cria_display(){
 
 	//alloca espaco em memoria para a estrutura display_info
 	display_info *new_display;
 	if(!(new_display = malloc(sizeof(display_info))))
 		exit(1);
-	
+
+	//estrutura do allegro pra obter informacoes da tela
+	ALLEGRO_DISPLAY_MODE *aux;
+	if(!(aux = malloc(sizeof(ALLEGRO_DISPLAY_MODE))))
+		exit(1);
+
+	//obtem as informacoes da tela
+	al_get_display_mode(0, aux);
+	//verifica se a informacao foi obtida corretamente
+	if(!aux)
+		exit(2);
+
+	al_set_new_display_flags(ALLEGRO_FULLSCREEN);
+
 	//cria o novo display
-	new_display->disp = al_create_display(tam_x, tam_y);
+	new_display->disp = al_create_display(aux->width, aux->height);
 
 	//inicializa os valores da estrutura
-	new_display->tam_x = tam_x;
-	new_display->tam_y = tam_y;
-	new_display->chao = tam_y /4;
-	new_display->full = false;
+	new_display->tam_x = aux->width;
+	new_display->tam_y = aux->height;
+	new_display->chao = aux->height /4;
+	new_display->full = true;
+
+	//destroi o auxiliar
+	free(aux);
 
 	return new_display;
 }
@@ -43,6 +59,9 @@ void full_screen(display_info *d, bool borda){
 		d->tam_y = aux->height;
 		d->chao = d->tam_y / 4;
 
+		//destroi o auxiliar
+		free(aux);
+
 		//faz o drive grafico atualizar o tamanho da tela
 		al_acknowledge_resize(d->disp);
 		return;
@@ -67,6 +86,9 @@ void full_screen(display_info *d, bool borda){
 	d->tam_x = aux->width;
 	d->tam_y = aux->height;
 	d->full = !borda;
+
+	//destroi o auxiliar
+	free(aux);
 
 	//atualiza o display
 	al_flip_display();

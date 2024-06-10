@@ -34,8 +34,8 @@ void move_players(player *p1, player *p2, display_info  *disp, bool *keys){
 	//atualiza a posicao x do player2
 	p2->x += VELOCIDADE * (keys[83] - keys[82]);
 	//verifica colisao do player2 com a borda da tela nas lateraiss
-	if(p2->x < p2->side/2 || p2->x > disp_x - p2->side/2)
-		p2->x = p2->side/2 * keys[82] + (disp_x - p2->side/2) * keys[83];
+	if(p2->x < p2->side/2 || p2->x > disp->tam_x - p2->side/2)
+		p2->x = p2->side/2 * keys[82] + (disp->tam_x - p2->side/2) * keys[83];
 
 
 

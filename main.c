@@ -63,7 +63,17 @@ int main(){
 			imprime_players(player_1, player_2);
 			al_flip_display();
 		} else if(code == 10 || code == 12){ //tecla pressionada
-			pressed_keys[event.keyboard.keycode] = pressed_keys[event.keyboard.keycode] ^ 1;	
+			pressed_keys[event.keyboard.keycode] = pressed_keys[event.keyboard.keycode] ^ 1;
+			//pressiona 'f11' para obter tela full-screen
+			if(event.keyboard.keycode == 57 && code == 10){
+				al_unregister_event_source(queue, al_get_display_event_source(disp->disp));
+				if(disp->full)
+					full_screen(disp, true);
+				else
+					full_screen(disp, false);
+				al_register_event_source(queue, al_get_display_event_source(disp->disp));
+			}
+
 		} else if(code == 42) //botao de fechar pressionado
 			encerra = true;
 	}

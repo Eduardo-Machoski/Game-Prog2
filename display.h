@@ -8,12 +8,17 @@ typedef struct {
 	int tam_x;
 	int tam_y;
 	int chao;
+	bool full;
 } display_info;
 
 //cria um novo display de tamanho tamx x tam_y
 //cria uma estrutura auxiliar para guardar informacoes do display
 //retorna um ponteiro para a estrutura auxiliar (display_info*)
 display_info *cria_display(int tam_x, int tam_y);
+
+//torana o display full-screen se possivel
+//attualiza o display e suas informacoes com os novos valores
+void full_screen(display_info *d, bool borda);
 
 //destroi um display_info e todos os seus componentes
 void destroy_display_info(display_info *d);

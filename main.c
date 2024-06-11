@@ -65,7 +65,7 @@ int main(){
 		} else if(code == 10 || code == 12){ //tecla pressionada
 			pressed_keys[event.keyboard.keycode] = pressed_keys[event.keyboard.keycode] ^ 1;
 
-			//printf("%d", event.keyboard.keycode);
+			printf("%d", event.keyboard.keycode);
 
 			//pressiona 'f11' para obter tela full-screen
 			if(event.keyboard.keycode == 57 && code == 10){
@@ -76,6 +76,10 @@ int main(){
 					full_screen(disp, false);
 				al_register_event_source(queue, al_get_display_event_source(disp->disp));
 			}
+
+			//pressiona 'esc' para pausar o jogo e abrir o menu de pausa
+			if(event.keyboard.keycode == 59 && code == 10)
+				encerra = pause_gui(queue, font, disp);
 
 		} else if(code == 42) //botao de fechar pressionado
 			encerra = true;

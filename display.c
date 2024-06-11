@@ -94,6 +94,23 @@ void full_screen(display_info *d, bool borda){
 	al_flip_display();
 }
 
+bool display_menu(menus *m, display_info *disp, ALLEGRO_FONT *font, ALLEGRO_EVENT_QUEUE *queue){
+	bool continua = true;
+	ALLEGRO_EVENT event;
+	while(continua){
+		for(int i = 0; i < m->opcoes; i++){
+			al_draw_text(font, al_map_rgb(0, 255, 255), disp->tam_x * 0.25, disp->tam_y * 0.25 + (i * disp->tam_y * 0.10), ALLEGRO_ALIGN_LEFT, m->strings[i]); 
+		}
+		al_flip_display();
+		al_wait_for_event(queue, &event);
+		if(event.type == 10 && event.keyboard.keycode == 59){
+			al_flush_event_queue(queue);
+			return false;
+		}
+	}
+	return true;	
+}
+
 //destroi um display_info e todos os seus componentes
 void destroy_display_info(display_info *d){
 	//destroi o display do allegro

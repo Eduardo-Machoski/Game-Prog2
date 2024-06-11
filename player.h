@@ -5,11 +5,6 @@
 #include<stdbool.h>
 #include<allegro5/allegro.h>
 
-#include"display.h"
-
-#define VELOCIDADE_X 10 
-#define VELOCIDADE_MAX_Y 0.09
-
 typedef struct {
 	int x;
 	int y;
@@ -19,6 +14,12 @@ typedef struct {
 	bool jump;
 	float jump_height;
 } player;
+
+#include"display.h"
+
+#define VELOCIDADE_X 10 
+#define VELOCIDADE_MAX_Y 0.09
+
 
 //cria a estrutura guardando as informações do player e inicializa ela
 player *cria_player(display_info *disp, int x_ini);

@@ -33,30 +33,30 @@ menus *cria_menu(int tam){
 }
 
 //pausa o jogo, removendo todos os inputs ainda nao processados
-bool pause_gui(ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_FONT *font, display_info *disp){
-
-	//limpa a queue de eventos
-	al_flush_event_queue(queue);
+bool pause_gui(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *timer){
 
 	//cria o menu que sera usado no display
 	menus *m;
-	if(!(m = cria_menu(2)))
-		return;
+	if(!(m = cria_menu(3)))
+		return false;
 
 	//cria as strings do menu
 	char fala1[] = "Return Game";
 	char fala2[] = "Exit Game";
+	char fala3[] = "Opcoes";
 
 	//inicializa as strings do menu
 	m->strings[0] = fala1;
-	m->strings[1] = fala2;
+	m->strings[1] = fala3;
+	m->strings[2] = fala2;
 
 	//inicializa os codigos
 	m->codes[0] = RETURN_GAME;
-       	m->codes[1] = MAIN_MENU;
+	m->codes[1] = 10;
+       	m->codes[2] = MAIN_MENU;
 	
 	//mostra o menu e realiza a operacao desejada pelo usuario
-	bool aux = display_menu(m, disp, font, queue);
+	bool aux = display_menu(m, disp, queue, timer);
 
 	//destroi o menu apos o seu uso
 	destroy_menu(m);

@@ -94,21 +94,56 @@ void full_screen(display_info *d, bool borda){
 	al_flip_display();
 }
 
-bool display_menu(menus *m, display_info *disp, ALLEGRO_FONT *font, ALLEGRO_EVENT_QUEUE *queue){
-	bool continua = true;
+//imprime um menu na tela e obtem inputs do usuario para realizar as operaçoes disponiveis em cada menu
+bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER *timer){
+
+	//apaga todos os eventos em queue antes do menu ser aberto	
+	al_flush_event_queue(queue);
+
+	//para os ticks do timer enquanto o menu estiver aberto
+	al_stop_timer(timer);
+
+
 	ALLEGRO_EVENT event;
+	ALLEGRO_FONT *font = al_create_builtin_font();
+	ALLEGRO_COLOR color = al_map_rgb(0, 255, 255);
+	ALLEGRO_COLOR color2 = al_map_rgb(0,0, 255);
+
+	//controle de qual opcao do menu o usuario esta atualmente selecionando
+	int atual = 0;
+
+	//controle de continuacao do menu
+	bool continua = true;
 	while(continua){
+
+		al_clear_to_color(al_map_rgb(0, 0 , 0));
+		//imprime as opçoes do menu
 		for(int i = 0; i < m->opcoes; i++){
-			al_draw_text(font, al_map_rgb(0, 255, 255), disp->tam_x * 0.25, disp->tam_y * 0.25 + (i * disp->tam_y * 0.10), ALLEGRO_ALIGN_LEFT, m->strings[i]); 
+			if(i == atual)
+				al_draw_text(font, color2, disp->tam_x * 0.25, disp->tam_y * 0.25 + (i * disp->tam_y * 0.10), ALLEGRO_ALIGN_LEFT, m->strings[i]); 
+			else
+				al_draw_text(font, color, disp->tam_x * 0.25, disp->tam_y * 0.25 + (i * disp->tam_y * 0.10), ALLEGRO_ALIGN_LEFT, m->strings[i]); 
 		}
-		al_flip_display();
+			al_flip_display();
 		al_wait_for_event(queue, &event);
-		if(event.type == 10 && event.keyboard.keycode == 59){
-			al_flush_event_queue(queue);
-			return false;
+		if(event.type == 10){
+			if(event.keyboard.keycode == 59)
+				continua = false;
+			else if (event.keyboard.keycode == 85)
+				atual = (atual + 1) % m->opcoes;
+			else if (event.keyboard.keycode == 84)
+				atual = (atual - 1 + m->opcoes) % m->opcoes;
 		}
 	}
-	return true;	
+
+	//apaga eventos restantes da queue para nao contaminar o jogo
+	al_flush_event_queue(queue);
+
+	al_destroy_font(font);
+
+	//retoma os ticks do timer
+	al_start_timer(timer);
+	return false;
 }
 
 //destroi um display_info e todos os seus componentes

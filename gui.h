@@ -23,7 +23,7 @@ typedef struct {
 menus *cria_menu(int tam);
 
 //pausa o jogo, remove todos os innputs ainda nao processados
-bool pause_gui(ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_FONT *font, display_info *disp);
+bool pause_gui(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *timer);
 
 //imprime ambos os players na tela
 void imprime_players(player *p1, player *p2);

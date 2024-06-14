@@ -19,7 +19,6 @@ int main(){
 	//cria os componentes do allegro
 	ALLEGRO_TIMER* timer = al_create_timer(1.0/30.0);
 	ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
-	ALLEGRO_FONT* font = al_create_builtin_font();
 
 	//cria o display e armazena suas informacoes
 	display_info *disp = cria_display();
@@ -50,6 +49,7 @@ int main(){
 	//se true encerra o programa
 	bool encerra = false;
 
+	
 	//roda até que o programa seja encerrado
 	while(!encerra){
 		//aguarda e obtem o proximo evento, assim como seu codigo
@@ -79,7 +79,7 @@ int main(){
 
 			//pressiona 'esc' para pausar o jogo e abrir o menu de pausa
 			if(event.keyboard.keycode == 59 && code == 10)
-				encerra = pause_gui(queue, font, disp);
+				encerra = pause_gui(queue, disp, timer);
 
 		} else if(code == 42) //botao de fechar pressionado
 			encerra = true;
@@ -93,7 +93,6 @@ int main(){
 	destroy_display_info(disp);
 
 	//destroi os componentes do allegro
-	al_destroy_font(font);
 	al_destroy_timer(timer);
 	al_destroy_event_queue(queue);
 	al_uninstall_keyboard();

@@ -22,8 +22,8 @@ display_info *cria_display();
 //attualiza o display e suas informacoes com os novos valores
 void full_screen(display_info *d, bool borda);
 
-//mostra o menu e realiza a operacao desejada pelo usuario
-bool display_menu(menus *m, display_info *disp, ALLEGRO_FONT *font, ALLEGRO_EVENT_QUEUE *queue);
+//imprime um menu na tela e obtem inputs do usuario para realizar as operaçoes disponiveis em cada menu
+bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER *timer);
 
 //destroi um display_info e todos os seus componentes
 void destroy_display_info(display_info *d);

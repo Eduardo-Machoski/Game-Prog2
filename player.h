@@ -27,6 +27,9 @@ player *cria_player(display_info *disp, int x_ini);
 //atualiza a posicao x e y dos players a partir dos seus controles
 void move_players(player *p1, player *p2, display_info *disp, bool *keys);
 
+//verifica e corrige colisao entre players
+void colisao_players(player *p1, player *p2, bool *keys);
+
 //destroi um player e seus componentes
 void destroy_player(player *elem);
 

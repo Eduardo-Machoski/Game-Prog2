@@ -78,8 +78,89 @@ void move_players(player *p1, player *p2, display_info  *disp, bool *keys){
 	} else if(keys[84] && p2->y == disp->tam_y - (p2->height/2 + disp->chao)) //p2 em posicao valida para saltar
 		p2->jump = true;
 
+	//verifica e arruma colisao entre players
+	colisao_players(p1, p2, keys);
 
 	return;
+}
+
+//verifica e arruma colisao entre players
+void colisao_players(player *p1, player *p2, bool *keys){
+	//verifica se osplayers estao na mesma altura relativa
+	if(p1->y > p2->y + p2->height * 0.45 || p2->y > p1->y + p1->height * 0.45)
+		return;
+
+	//verifica qual player está na esquerda e qual na direita em relacao ao outro
+	player *esq, *dir;
+	int esq_half, dir_half;
+
+	//guarda os movimentos dos players
+	bool esq_move_dir, dir_move_esq;
+	bool esq_move_esq, dir_move_dir;
+	if(p1->x < p2->x){
+		esq = p1;
+		dir = p2;
+		esq_half = p1->side / 2;
+		dir_half = p2->side / 2;
+		esq_move_dir = keys[4];
+		dir_move_esq = keys[82];
+		esq_move_esq = keys[1];
+		dir_move_dir = keys[83];
+	} else {
+		esq = p2;
+		dir = p1;
+		esq_half = p2->side / 2;
+		dir_half = p1->side / 2;
+		esq_move_dir = keys[83];
+		dir_move_esq = keys[1];
+		esq_move_esq = keys[82];
+		dir_move_dir = keys[4];
+	}
+
+	//sem colisao entre players
+	if(esq->x + esq_half <= dir->x - dir_half)
+		return;
+
+	//verifica se os players estao andando
+	if(!(dir_move_dir || esq_move_dir || esq_move_esq || dir_move_dir)){
+		if(dir->y < esq->y)
+			dir->x = esq->x + dir_half + esq_half;
+		else
+			esq->x = dir->x - (dir_half + esq_half);
+	} else if(!dir_move_dir && !esq_move_esq){//ambos os players sem input para o lado oposto da colisao
+		//player direito andando para esquerda e player esquerdo parado
+		if(!esq_move_dir){
+			dir->x = esq->x + dir_half + esq_half;
+		} else if(!dir_move_esq){//player esquerdo andando para direita e player direito parado
+			esq->x = dir->x - (dir_half + esq_half);
+		} else{ //ambos parados ou se movimentandoem em sentido de colisao
+			int collision = esq->x + (dir->x - esq->x)/2;
+			esq->x = collision - esq_half;
+			dir->x = collision + dir_half;
+		}
+	} else if(!dir_move_dir){//player esquerdo se afastando do direito
+		if(esq_move_dir) //player esquerdo parado
+			dir->x = esq->x + dir_half + esq_half;
+		else if(dir_move_esq){//ambos se movimentdando na mesma direcao
+			int collision = esq->x + (dir->x - esq->x)/2;
+			esq->x = collision - esq_half;
+			dir->x = collision + dir_half;
+		} else{//player direito parado
+			esq->x = dir->x - (dir_half + esq_half);
+		}
+	} else if(!esq_move_esq){//player direito se afalstando do esquerdo
+		if(dir_move_esq) //player direito parado
+			esq->x = dir->x - (esq_half + dir_half);
+		else if(esq_move_dir){//ambos se movimentando na mesma direcao
+			int collision = esq->x + (dir->x - esq->x)/2;
+			esq->x = collision - esq_half;
+			dir->x = collision + dir_half;
+		} else{//player esquerdo parado
+			dir->x = esq->x + (dir_half + esq_half);
+		}
+	} else{//ambos os players se afastando
+	
+	}
 }
 
 //destroi um player e seus componentes

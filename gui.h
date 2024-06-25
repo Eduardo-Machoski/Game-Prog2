@@ -17,13 +17,20 @@ typedef struct {
 
 #define RETURN_GAME 0
 #define MAIN_MENU 1
+#define EXIT_GAME 2
+#define START_GAME 3
 
 
 //cria um menu e inicializa suas informacoes
 menus *cria_menu(int tam);
 
+//menu principal do jogo
+bool main_menu(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *timer, bool reset, player *p1, player *p2, bool keys[]);
+
+void selecao_personagem(player *p1, player *p2);
+
 //pausa o jogo, remove todos os innputs ainda nao processados
-bool pause_gui(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *timer);
+bool pause_gui(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *timer, player *p1, player *p2, bool keys[]);
 
 //imprime ambos os players na tela
 void imprime_players(player *p1, player *p2);

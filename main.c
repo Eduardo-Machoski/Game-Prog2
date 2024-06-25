@@ -28,6 +28,12 @@ int main(){
 	al_register_event_source(queue, al_get_display_event_source(disp->disp));
 	al_register_event_source(queue, al_get_timer_event_source(timer));
 
+	//controle de movimento dos personagens
+	bool pressed_keys[ALLEGRO_KEY_MAX] = {false};
+
+	//abre o menu principal no inicio do jogo
+	//caso a variavel encerra == true, encerra o programa
+	bool encerra = main_menu(queue, disp, timer, false, NULL, NULL, pressed_keys);
 
 	//começa o relogio do programa
 	al_start_timer(timer);
@@ -43,11 +49,7 @@ int main(){
 	//codigo do evento atual
 	int code;
 
-	//controle de movimento dos personagens
-	bool pressed_keys[ALLEGRO_KEY_MAX] = {false};
 
-	//se true encerra o programa
-	bool encerra = false;
 
 	
 	//roda até que o programa seja encerrado
@@ -62,13 +64,14 @@ int main(){
 			al_clear_to_color(al_map_rgb(0,0,0));
 			imprime_players(player_1, player_2);
 			al_flip_display();
-		} else if(code == 10 || code == 12){ //tecla pressionada
+		} else if(code == 10){ //tecla pressionada
+			//atualiza o controle de movimento dos personagens
 			pressed_keys[event.keyboard.keycode] = pressed_keys[event.keyboard.keycode] ^ 1;
 
 			printf("%d", event.keyboard.keycode);
 
 			//pressiona 'f11' para obter tela full-screen
-			if(event.keyboard.keycode == 57 && code == 10){
+			if(event.keyboard.keycode == 57){
 				al_unregister_event_source(queue, al_get_display_event_source(disp->disp));
 				if(disp->full)
 					full_screen(disp, true);
@@ -78,9 +81,12 @@ int main(){
 			}
 
 			//pressiona 'esc' para pausar o jogo e abrir o menu de pausa
-			if(event.keyboard.keycode == 59 && code == 10)
-				encerra = pause_gui(queue, disp, timer);
+			if(event.keyboard.keycode == 59)
+				encerra = pause_gui(queue, disp, timer, player_1, player_2, pressed_keys);
 
+		} else if(code == 12){ // tecla liberada
+			//atualiza o controle de movimento dos personagens
+			pressed_keys[event.keyboard.keycode] = pressed_keys[event.keyboard.keycode] ^ 1;
 		} else if(code == 42) //botao de fechar pressionado
 			encerra = true;
 	}

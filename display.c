@@ -95,7 +95,7 @@ void full_screen(display_info *d, bool borda){
 }
 
 //imprime um menu na tela e obtem inputs do usuario para realizar as operaçoes disponiveis em cada menu
-bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER *timer){
+bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER *timer, player *p1, player *p2, bool keys[]){
 
 	//apaga todos os eventos em queue antes do menu ser aberto	
 	al_flush_event_queue(queue);
@@ -112,6 +112,9 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 	//controle de qual opcao do menu o usuario esta atualmente selecionando
 	int atual = 0;
 
+	//retorno da funcao
+	bool retorno = false;
+
 	//controle de continuacao do menu
 	bool continua = true;
 	while(continua){
@@ -119,31 +122,49 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 		al_clear_to_color(al_map_rgb(0, 0 , 0));
 		//imprime as opçoes do menu
 		for(int i = 0; i < m->opcoes; i++){
-			if(i == atual)
+			if(i == atual) //opçao atualmente selecionada
 				al_draw_text(font, color2, disp->tam_x * 0.25, disp->tam_y * 0.25 + (i * disp->tam_y * 0.10), ALLEGRO_ALIGN_LEFT, m->strings[i]); 
-			else
+			else //outras opçoes
 				al_draw_text(font, color, disp->tam_x * 0.25, disp->tam_y * 0.25 + (i * disp->tam_y * 0.10), ALLEGRO_ALIGN_LEFT, m->strings[i]); 
 		}
-			al_flip_display();
+
+		//atualiza a tela
+		al_flip_display();
+
+		//espera e obtem input do usuario
 		al_wait_for_event(queue, &event);
 		if(event.type == 10){
-			if(event.keyboard.keycode == 59)
+			if(event.keyboard.keycode == 59) //pressiona 'esc' e fecha o menu de pause
 				continua = false;
-			else if (event.keyboard.keycode == 85)
+			else if (event.keyboard.keycode == 85) //pressiona o botao para baixo
 				atual = (atual + 1) % m->opcoes;
-			else if (event.keyboard.keycode == 84)
+			else if (event.keyboard.keycode == 84) //pressiona o botao para cima
 				atual = (atual - 1 + m->opcoes) % m->opcoes;
-		}
+			else if (event.keyboard.keycode == 67){//pressiona 'ENTER'
+				if(m->codes[atual] == MAIN_MENU)
+					retorno = main_menu(queue, disp, timer, true, p1, p2, keys);
+				else if(m->codes[atual] == EXIT_GAME)
+					retorno = true;
+				continua = false;
+			}
+			keys[event.keyboard.keycode] = keys[event.keyboard.keycode] ^ 1;
+		} else if (event.type == 12)
+			keys[event.keyboard.keycode] = keys[event.keyboard.keycode] ^ 1;
 	}
 
-	//apaga eventos restantes da queue para nao contaminar o jogo
-	al_flush_event_queue(queue);
+	//atualiza as teclas apertadas e soltas durante o menu
+	while(!al_is_event_queue_empty(queue)){
+		al_get_next_event(queue, &event);
+		if(event.type == 10 || event.type == 12)
+		keys[event.keyboard.keycode] = keys[event.keyboard.keycode] ^ 1;
+	}
 
+	//destoi a fonte
 	al_destroy_font(font);
 
 	//retoma os ticks do timer
 	al_start_timer(timer);
-	return false;
+	return retorno;
 }
 
 //destroi um display_info e todos os seus componentes

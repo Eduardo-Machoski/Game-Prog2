@@ -23,7 +23,7 @@ display_info *cria_display();
 void full_screen(display_info *d, bool borda);
 
 //imprime um menu na tela e obtem inputs do usuario para realizar as operaçoes disponiveis em cada menu
-bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER *timer);
+bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER *timer, player *p1, player *p2, bool keys[]);
 
 //destroi um display_info e todos os seus componentes
 void destroy_display_info(display_info *d);

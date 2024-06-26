@@ -122,7 +122,7 @@ void colisao_players(player *p1, player *p2, bool *keys){
 		return;
 
 	//verifica se os players estao andando
-	if(!(dir_move_dir || esq_move_dir || esq_move_esq || dir_move_dir)){
+	if(!(dir_move_esq || esq_move_dir || esq_move_esq || dir_move_dir)){
 		if(dir->y < esq->y)
 			dir->x = esq->x + dir_half + esq_half;
 		else
@@ -148,7 +148,7 @@ void colisao_players(player *p1, player *p2, bool *keys){
 		} else{//player direito parado
 			esq->x = dir->x - (dir_half + esq_half);
 		}
-	} else if(!esq_move_esq){//player direito se afalstando do esquerdo
+	} else{//player direito se afalstando do esquerdo
 		if(dir_move_esq) //player direito parado
 			esq->x = dir->x - (esq_half + dir_half);
 		else if(esq_move_dir){//ambos se movimentando na mesma direcao
@@ -158,8 +158,6 @@ void colisao_players(player *p1, player *p2, bool *keys){
 		} else{//player esquerdo parado
 			dir->x = esq->x + (dir_half + esq_half);
 		}
-	} else{//ambos os players se afastando
-	
 	}
 }
 

@@ -15,6 +15,8 @@ typedef struct {
 	bool jump;
 	float jump_height;
 	ALLEGRO_BITMAP *sprite;
+	int sprite_w;
+	int sprite_h;
 } player;
 
 #include"display.h"

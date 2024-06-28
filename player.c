@@ -21,6 +21,8 @@ player *cria_player(display_info *disp, int ini_x){
 	aux->jump = false;
 	aux->jump_height = VELOCIDADE_MAX_Y;
 	aux->sprite = sprite;
+	aux->sprite_w = al_get_bitmap_width(sprite);
+	aux->sprite_h = al_get_bitmap_height(sprite);
 
 	//posicao horizontal inicial (ini_x% da tela)
 	aux->x = disp->tam_x * (ini_x/100.0);

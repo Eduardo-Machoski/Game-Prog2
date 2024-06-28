@@ -169,8 +169,10 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 
 //imprime ambos os players na tela
 void imprime_players(player *p1, player *p2){
-	al_draw_bitmap(p1->sprite, p1->x, p1->y, 0);
-	al_draw_bitmap(p2->sprite, p2->x, p2->y, 0);
+	al_draw_rectangle(p1->x - p1->side / 2, p1->y - p1->height/2, p1->x + p1->side/2, p1->y + p1->height/2, al_map_rgb(0, 0, 255), 0);
+	al_draw_rectangle(p2->x - p2->side / 2, p2->y - p2->height/2, p2->x + p2->side/2, p2->y + p2->height/2, al_map_rgb(255, 0, 0), 0);
+	al_draw_scaled_bitmap(p1->sprite, 0, 0, p1->sprite_w, p1->sprite_h, p1->x - p1->side/2, p1->y - p1->height/2, p1->side, p1->height, ALLEGRO_MIN_LINEAR);
+	al_draw_scaled_bitmap(p2->sprite, 0, 0, p2->sprite_w, p2->sprite_h, p2->x - p2->side/2, p2->y - p2->height/2, p2->side, p2->height, 0);
 }
 
 //destroi um display_info e todos os seus componentes

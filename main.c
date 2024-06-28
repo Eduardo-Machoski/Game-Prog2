@@ -4,6 +4,7 @@
 
 #include<allegro5/allegro.h>
 #include<allegro5/allegro_font.h>
+#include<allegro5/allegro_image.h>
 #include<allegro5/allegro_primitives.h>
 
 #include"player.h"
@@ -14,6 +15,7 @@ int main(){
 	//inicializa os componentos do allegro
 	al_init();
 	al_init_primitives_addon();
+	al_init_image_addon();
 	al_install_keyboard();
 
 	//cria os componentes do allegro

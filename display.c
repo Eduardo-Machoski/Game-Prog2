@@ -167,6 +167,12 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 	return retorno;
 }
 
+//imprime ambos os players na tela
+void imprime_players(player *p1, player *p2){
+	al_draw_bitmap(p1->sprite, p1->x, p1->y, 0);
+	al_draw_bitmap(p2->sprite, p2->x, p2->y, 0);
+}
+
 //destroi um display_info e todos os seus componentes
 void destroy_display_info(display_info *d){
 	//destroi o display do allegro

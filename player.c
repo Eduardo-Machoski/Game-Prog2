@@ -8,12 +8,19 @@ player *cria_player(display_info *disp, int ini_x){
         if(!(aux = malloc(sizeof(player))))
 	       exit(1);
 
+	//bitmap para as sprites
+	ALLEGRO_BITMAP *sprite = NULL;
+	if(!(sprite = al_load_bitmap("Sprites/ball.png")))
+		exit(1);
+
+
 	//inicializa o player
 	aux->side = disp->tam_x / 19;
 	aux->height = disp->tam_x / 8;
 	aux->vida = 100;
 	aux->jump = false;
 	aux->jump_height = VELOCIDADE_MAX_Y;
+	aux->sprite = sprite;
 
 	//posicao horizontal inicial (ini_x% da tela)
 	aux->x = disp->tam_x * (ini_x/100.0);

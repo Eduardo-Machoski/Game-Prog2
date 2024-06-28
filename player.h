@@ -4,6 +4,7 @@
 #include<stdlib.h>
 #include<stdbool.h>
 #include<allegro5/allegro.h>
+#include<allegro5/allegro_image.h>
 
 typedef struct {
 	int x;
@@ -13,6 +14,7 @@ typedef struct {
 	int vida;
 	bool jump;
 	float jump_height;
+	ALLEGRO_BITMAP *sprite;
 } player;
 
 #include"display.h"

@@ -9,20 +9,25 @@ player *cria_player(display_info *disp, int ini_x){
 	       exit(1);
 
 	//bitmap para as sprites
-	ALLEGRO_BITMAP *sprite = NULL;
-	if(!(sprite = al_load_bitmap("Sprites/ball.png")))
+	ALLEGRO_BITMAP *bitmap = NULL;
+	if(!(bitmap = al_load_bitmap("Sprites/Martial_Hero/Teste1.png")))
 		exit(1);
 
+	ALLEGRO_BITMAP *sprite = NULL;
+	if(!(sprite = al_create_sub_bitmap(bitmap, 0, 0, al_get_bitmap_width(bitmap)/4, al_get_bitmap_height(bitmap))))
+		exit(1);
 
 	//inicializa o player
-	aux->side = disp->tam_x / 19;
+	aux->side = disp->tam_x / 16;
 	aux->height = disp->tam_x / 8;
 	aux->vida = 100;
 	aux->jump = false;
 	aux->jump_height = VELOCIDADE_MAX_Y;
+	aux->bitmap = bitmap;
 	aux->sprite = sprite;
-	aux->sprite_w = al_get_bitmap_width(sprite);
-	aux->sprite_h = al_get_bitmap_height(sprite);
+	aux->sprite_atual = 0;
+	aux->sprite_w = al_get_bitmap_width(bitmap) / 4;
+	aux->sprite_h = al_get_bitmap_height(bitmap);
 
 	//posicao horizontal inicial (ini_x% da tela)
 	aux->x = disp->tam_x * (ini_x/100.0);
@@ -170,7 +175,35 @@ void colisao_players(player *p1, player *p2, bool *keys){
 	}
 }
 
+//verifica o estado atual do player e retorna um subbitmap com a sprite atual que deve ser desenhada
+void seleciona_sprite(player *p){
+	bool troca = false;
+	
+	//verifica se é necessario mudar a imagem por conta do tempo
+	if(p->tempo_ciclo >= 5){
+		int num_sprites = 4;
+		//troca o indice da imagem (depende de qual animaçao esta ocorrendo no momento)
+		p->sprite_atual = (p->sprite_atual + 1) % num_sprites;
+		troca = true;
+
+		//reinicia o tempo do ciclo atual
+		p->tempo_ciclo = 0;
+	} else{
+		//acrescenta tempo no ciclo atual
+		p->tempo_ciclo += 1;
+	}
+
+	//cria o subbitmap com a sprite selecionada para impressao
+	if(troca){
+		al_destroy_bitmap(p->sprite);
+		p->sprite = al_create_sub_bitmap(p->bitmap, p->sprite_w * p->sprite_atual, 0, p->sprite_w * (p->sprite_atual + 1), p->sprite_h);
+		if(!p->sprite)
+			exit(1);
+	}
+}
+
 //destroi um player e seus componentes
 void destroy_player(player *elem){
+	al_destroy_bitmap(elem->bitmap);
 	free(elem);
 }

@@ -20,6 +20,7 @@ typedef struct {
 	int tempo_ciclo; //quanto tempo esta com a mesma sprite
 	int sprite_w; //width da sprite
 	int sprite_h; //height da sprite
+	bool olha_esquerda; //indica se a sprite esta olhando para a esquerda
 } player;
 
 #include"display.h"
@@ -29,7 +30,7 @@ typedef struct {
 
 
 //cria a estrutura guardando as informações do player e inicializa ela
-player *cria_player(display_info *disp, int x_ini);
+player *cria_player(display_info *disp, int x_ini, bool esquerda);
 
 //atualiza a posicao x e y dos players a partir dos seus controles
 void move_players(player *p1, player *p2, display_info *disp, bool *keys);
@@ -39,6 +40,9 @@ void colisao_players(player *p1, player *p2, bool *keys);
 
 //verifica o estado atual do player e atualiza p->sprite com a sprite atual que deve ser desenhada
 void seleciona_sprite(player *p);
+
+//verifica qual a orientacao dos players (esquerda ou direita)
+void orientacao_players(player *p1, player *p2, bool *keys);
 
 //destroi um player e seus componentes
 void destroy_player(player *elem);

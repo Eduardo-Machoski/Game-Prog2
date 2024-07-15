@@ -42,8 +42,8 @@ int main(){
 
 
 	//cria amobos os players
-	player *player_1 = cria_player(disp, 10);
-	player *player_2 = cria_player(disp, 90);
+	player *player_1 = cria_player(disp, 10, false);
+	player *player_2 = cria_player(disp, 90, true);
 
 	//evento atual sendo lidado no loop
 	ALLEGRO_EVENT event;
@@ -64,7 +64,7 @@ int main(){
 		if(code == 30){
 			move_players(player_1, player_2, disp, pressed_keys);
 			al_clear_to_color(al_map_rgb(0,0,0));
-			imprime_players(player_1, player_2);
+			imprime_players(player_1, player_2, pressed_keys);
 			al_flip_display();
 		} else if(code == 10){ //tecla pressionada
 			//atualiza o controle de movimento dos personagens

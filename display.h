@@ -27,7 +27,7 @@ void full_screen(display_info *d, bool borda);
 bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER *timer, player *p1, player *p2, bool keys[]);
 
 //imprime ambos os players na tela
-void imprime_players(player *p1, player *p2);
+void imprime_players(player *p1, player *p2, bool *keys);
 
 //destroi um display_info e todos os seus componentes
 void destroy_display_info(display_info *d);

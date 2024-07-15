@@ -1,7 +1,7 @@
 #include"player.h"
 
 //cria a estrutura guardando as informações do player e inicializa ela
-player *cria_player(display_info *disp, int ini_x){
+player *cria_player(display_info *disp, int ini_x, bool esquerda){
 
 	//cria a estrutura e verifica a alocação de memoria
 	player *aux;
@@ -28,6 +28,7 @@ player *cria_player(display_info *disp, int ini_x){
 	aux->sprite_atual = 0;
 	aux->sprite_w = al_get_bitmap_width(bitmap) / 4;
 	aux->sprite_h = al_get_bitmap_height(bitmap);
+	aux->olha_esquerda = esquerda;
 
 	//posicao horizontal inicial (ini_x% da tela)
 	aux->x = disp->tam_x * (ini_x/100.0);
@@ -202,8 +203,24 @@ void seleciona_sprite(player *p){
 	}
 }
 
+//verifica qual a orientacao dos players (esquerda ou direita)
+void orientacao_players(player *p1, player *p2, bool *keys){
+	//orientaçao do p1
+	if(keys[1] && !keys[4])
+		p1->olha_esquerda = true;
+	else if(!keys[1] && keys[4])
+		p1->olha_esquerda = false;
+
+	//orientacao do p2
+	if(keys[82] && !keys[83])
+		p2->olha_esquerda = true;
+	else if(keys[83] && !keys[82])
+		p2->olha_esquerda = false;
+}
+
 //destroi um player e seus componentes
 void destroy_player(player *elem){
 	al_destroy_bitmap(elem->bitmap);
+	al_destroy_bitmap(elem->sprite);
 	free(elem);
 }

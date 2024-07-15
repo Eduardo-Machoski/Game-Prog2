@@ -168,13 +168,27 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 }
 
 //imprime ambos os players na tela
-void imprime_players(player *p1, player *p2){
+void imprime_players(player *p1, player *p2, bool *keys){
+	//imprime hitbox
 	al_draw_rectangle(p1->x - p1->side / 2, p1->y - p1->height/2, p1->x + p1->side/2, p1->y + p1->height/2, al_map_rgb(0, 0, 255), 0);
 	al_draw_rectangle(p2->x - p2->side / 2, p2->y - p2->height/2, p2->x + p2->side/2, p2->y + p2->height/2, al_map_rgb(255, 0, 0), 0);
+
+	//seleciona a sprite correta a ser impressa nesse ciclo
 	seleciona_sprite(p1);
 	seleciona_sprite(p2);
-	al_draw_scaled_bitmap(p1->sprite, 0, 0, p1->sprite_w, p1->sprite_h, p1->x - p1->side/2, p1->y - p1->height/2, p1->side, p1->height, ALLEGRO_MIN_LINEAR);
-	al_draw_scaled_bitmap(p2->sprite, 0, 0, p2->sprite_w, p2->sprite_h, p2->x - p2->side/2, p2->y - p2->height/2, p2->side, p2->height, ALLEGRO_MIN_LINEAR);
+
+	//verifica qual a orientacao do player (esquerda ou direita)
+	orientacao_players(p1, p2, keys);
+
+	//imprime os players
+	if(p1->olha_esquerda)
+		al_draw_scaled_bitmap(p1->sprite, 0, 0, p1->sprite_w, p1->sprite_h, p1->x - p1->side/2, p1->y - p1->height/2, p1->side, p1->height, ALLEGRO_MIN_LINEAR ^ ALLEGRO_FLIP_HORIZONTAL);	
+	else
+		al_draw_scaled_bitmap(p1->sprite, 0, 0, p1->sprite_w, p1->sprite_h, p1->x - p1->side/2, p1->y - p1->height/2, p1->side, p1->height, ALLEGRO_MIN_LINEAR);
+	if(p2->olha_esquerda)
+	al_draw_scaled_bitmap(p2->sprite, 0, 0, p2->sprite_w, p2->sprite_h, p2->x - p2->side/2, p2->y - p2->height/2, p2->side, p2->height, ALLEGRO_MIN_LINEAR ^ ALLEGRO_FLIP_HORIZONTAL);
+	else
+		al_draw_scaled_bitmap(p2->sprite, 0, 0, p2->sprite_w, p2->sprite_h, p2->x - p2->side/2, p2->y - p2->height/2, p2->side, p2->height, ALLEGRO_MIN_LINEAR);
 }
 
 //destroi um display_info e todos os seus componentes

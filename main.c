@@ -52,8 +52,6 @@ int main(){
 	int code;
 
 
-
-	
 	//roda até que o programa seja encerrado
 	while(!encerra){
 		//aguarda e obtem o proximo evento, assim como seu codigo
@@ -64,6 +62,7 @@ int main(){
 		if(code == 30){
 			move_players(player_1, player_2, disp, pressed_keys);
 			al_clear_to_color(al_map_rgb(0,0,0));
+			imprime_vida(disp, player_1, player_2);
 			imprime_players(player_1, player_2, pressed_keys);
 			al_flip_display();
 		} else if(code == 10){ //tecla pressionada

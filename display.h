@@ -1,5 +1,5 @@
-#ifndef __DiSPLAY__
-#define __DiSPLAY__
+#ifndef __DISPLAY__
+#define __DISPLAY__
 
 #include<allegro5/allegro.h>
 #include<allegro5/allegro_image.h>
@@ -28,6 +28,9 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 
 //imprime ambos os players na tela
 void imprime_players(player *p1, player *p2, bool *keys);
+
+//imprime a barra de vida de ambos os players
+void imprime_vida(display_info *disp, player *p1, player *p2);
 
 //destroi um display_info e todos os seus componentes
 void destroy_display_info(display_info *d);

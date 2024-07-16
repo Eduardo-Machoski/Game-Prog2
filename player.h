@@ -11,7 +11,7 @@ typedef struct {
 	int y; //pos y do player
 	int side; //tamanho do lado do hitbox
 	int height; //altura do hitbox
-	int vida; //vida atual
+	float vida; //vida atual
 	bool jump; //true se o player estiver pulando
 	float jump_height; //quantidade que o player deve pular se jump == true
 	ALLEGRO_BITMAP *bitmap; //bitmap com todas as sprites do player

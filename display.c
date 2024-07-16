@@ -186,9 +186,20 @@ void imprime_players(player *p1, player *p2, bool *keys){
 	else
 		al_draw_scaled_bitmap(p1->sprite, 0, 0, p1->sprite_w, p1->sprite_h, p1->x - p1->side/2, p1->y - p1->height/2, p1->side, p1->height, ALLEGRO_MIN_LINEAR);
 	if(p2->olha_esquerda)
-	al_draw_scaled_bitmap(p2->sprite, 0, 0, p2->sprite_w, p2->sprite_h, p2->x - p2->side/2, p2->y - p2->height/2, p2->side, p2->height, ALLEGRO_MIN_LINEAR ^ ALLEGRO_FLIP_HORIZONTAL);
+		al_draw_scaled_bitmap(p2->sprite, 0, 0, p2->sprite_w, p2->sprite_h, p2->x - p2->side/2, p2->y - p2->height/2, p2->side, p2->height, ALLEGRO_MIN_LINEAR ^ ALLEGRO_FLIP_HORIZONTAL);
 	else
 		al_draw_scaled_bitmap(p2->sprite, 0, 0, p2->sprite_w, p2->sprite_h, p2->x - p2->side/2, p2->y - p2->height/2, p2->side, p2->height, ALLEGRO_MIN_LINEAR);
+}
+
+//imprime a barra de vida de ambos os players
+void imprime_vida(display_info *disp, player *p1, player *p2){
+	//vida do player1
+	al_draw_rectangle(disp->tam_x/15, disp->tam_y/30, disp->tam_x/3, disp->tam_y/12, al_map_rgb(255, 255, 255), 3);
+	al_draw_rectangle(disp->tam_x/15 + 2, disp->tam_y/30 + 1, (disp->tam_x/3 - 2) * p1->vida, disp->tam_y/12 - 2, al_map_rgb(255, 0, 0), 3);
+
+	//vida do player2
+	al_draw_rectangle(2 * disp->tam_x/3, disp->tam_y/30, disp->tam_x - disp->tam_x/15, disp->tam_y/12, al_map_rgb(255, 255, 255), 0);
+	al_draw_rectangle(2 * disp->tam_x/3 + 2 + (disp->tam_x/3 * (1 - p1->vida)), disp->tam_y/30 + 2, disp->tam_x - disp->tam_x/15 - 2, disp->tam_y/12 -2, al_map_rgb(255, 0, 0), 0);
 }
 
 //destroi um display_info e todos os seus componentes
@@ -199,3 +210,4 @@ void destroy_display_info(display_info *d){
 	//destroi a estrutura display_info
 	free(d);
 }
+

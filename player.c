@@ -20,7 +20,7 @@ player *cria_player(display_info *disp, int ini_x, bool esquerda){
 	//inicializa o player
 	aux->side = disp->tam_x / 16;
 	aux->height = disp->tam_x / 8;
-	aux->vida = 100;
+	aux->vida = 0.90;
 	aux->jump = false;
 	aux->jump_height = VELOCIDADE_MAX_Y;
 	aux->bitmap = bitmap;

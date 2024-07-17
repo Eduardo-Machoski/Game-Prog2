@@ -19,24 +19,27 @@ player *cria_player(display_info *disp, int ini_x, bool esquerda){
 	if(!(file = fopen(name, "r")))
 		exit(1);
 
-
+	//numero de sprites de animação
 	int num_sprites;
 	fscanf(file, "%d", &num_sprites);
 
+	//dimençoes do subbitmap
 	int width = al_get_bitmap_width(bitmap)/num_sprites;
 	int height = al_get_bitmap_height(bitmap);
 
+	//cria o subbitmap que ira conter apenas uma sprite
 	ALLEGRO_BITMAP *sprite = NULL;
 	if(!(sprite = al_create_sub_bitmap(bitmap, 0, 0, width, height)))
 		exit(1);
 
+	//dimensoes do corpo do personagem
 	int tam_x, tam_y;
 	fscanf(file, "%d %d", &tam_x, &tam_y);
 
+	//indices onde cada sequencia de animacao comeca
 	int *indice_sprites;
 	if(!(indice_sprites = malloc(sizeof(int) * 7)))
 		exit(1);
-
 	for(int i = 0; i < 7; i++)
 		fscanf(file, "%d", &indice_sprites[i]);
 
@@ -56,6 +59,8 @@ player *cria_player(display_info *disp, int ini_x, bool esquerda){
 	aux->olha_esquerda = esquerda;
 	aux->num_sprites = num_sprites;
 	aux->i_sprites = indice_sprites;
+	aux->attack = 0;
+	aux->recuo = false;
 
 	//posicao horizontal inicial (ini_x% da tela)
 	aux->x = disp->tam_x * (ini_x/100.0);
@@ -104,7 +109,7 @@ void move_players(player *p1, player *p2, display_info  *disp, bool *keys){
 
 		//atualiza o valor do salto para efeito da gravidade
 		p1->jump_height -= 0.01;
-	} else if(keys[23] && p1->y == disp->tam_y - (p1->height/2 + disp->chao)) //p1 em posicao valida para saltar
+	} else if(keys[23] && p1->attack  == 0 && !p1->recuo && p1->y == disp->tam_y - (p1->height/2 + disp->chao)) //p1 em posicao valida para saltar
 		p1->jump = true;
 
 	//verifica se o p2 esta saltando
@@ -120,7 +125,7 @@ void move_players(player *p1, player *p2, display_info  *disp, bool *keys){
 
 		//atualiza o valor do salto para efeito da gravidade
 		p2->jump_height -= 0.01;
-	} else if(keys[84] && p2->y == disp->tam_y - (p2->height/2 + disp->chao)) //p2 em posicao valida para saltar
+	} else if(keys[84] && p2->attack == 0  && !p2->recuo && p2->y == disp->tam_y - (p2->height/2 + disp->chao)) //p2 em posicao valida para saltar
 		p2->jump = true;
 
 	//verifica e arruma colisao entre players
@@ -272,5 +277,6 @@ void orientacao_players(player *p1, player *p2, bool *keys){
 void destroy_player(player *elem){
 	al_destroy_bitmap(elem->bitmap);
 	al_destroy_bitmap(elem->sprite);
+	free(elem->i_sprites);
 	free(elem);
 }

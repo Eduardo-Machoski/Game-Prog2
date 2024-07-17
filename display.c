@@ -212,4 +212,3 @@ void destroy_display_info(display_info *d){
 	//destroi a estrutura display_info
 	free(d);
 }
-

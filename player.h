@@ -14,18 +14,20 @@ typedef struct {
 	int side_sprite; //tamanho do lado do hitbox da sprite
 	int height; //altura do hitbox
 	int height_sprite; //altura da hitbox na sprite
-	float vida; //vida atual
-	bool jump; //true se o player estiver pulando
-	float jump_height; //quantidade que o player deve pular se jump == true
-	ALLEGRO_BITMAP *bitmap; //bitmap com todas as sprites do player
-	ALLEGRO_BITMAP *sprite; //bitmap com a ultima sprite impressa do player
 	int sprite_atual; //indice da sprite que o player imprimiu por ultimo
 	int tempo_ciclo; //quanto tempo esta com a mesma sprite
 	int sprite_w; //width da sprite
 	int sprite_h; //height da sprite
-	bool olha_esquerda; //indica se a sprite esta olhando para a esquerda
 	int num_sprites; //numero de sprites que o personagem possui
 	int *i_sprites; //indica o indice inicial de cada grupo de sprits em uma animacao
+	float vida; //vida atual
+	float jump_height; //quantidade que o player deve pular se jump == true
+	bool recuo; //indica se o player esta em estado de recuo apos receber um ataque
+	bool olha_esquerda; //indica se a sprite esta olhando para a esquerda
+	bool jump; //true se o player estiver pulando
+	char attack; //indica se um ataque esta sendo realizado
+	ALLEGRO_BITMAP *bitmap; //bitmap com todas as sprites do player
+	ALLEGRO_BITMAP *sprite; //bitmap com a ultima sprite impressa do player
 } player;
 
 #include"display.h"

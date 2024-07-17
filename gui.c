@@ -65,7 +65,7 @@ bool main_menu(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *ti
 }
 
 void selecao_personagem(player *p1, player *p2){
-	return;
+	return;	
 }
 
 //pausa o jogo, removendo todos os inputs ainda nao processados

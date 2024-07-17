@@ -11,7 +11,12 @@
 #include"gui.h"
 #include"display.h"
 
-int main(){
+int main(int argc, char *argv[]){
+	bool dev_mode = false;
+
+	if(argc == 2 && strcmp(argv[1], "dev") == 0)
+		dev_mode = true;
+
 	//inicializa os componentos do allegro
 	al_init();
 	al_init_primitives_addon();
@@ -36,7 +41,7 @@ int main(){
 	//abre o menu principal no inicio do jogo
 	//caso a variavel encerra == true, encerra o programa
 	bool encerra = main_menu(queue, disp, timer, false, NULL, NULL, pressed_keys);
-
+	
 	//começa o relogio do programa
 	al_start_timer(timer);
 
@@ -51,6 +56,10 @@ int main(){
 	//codigo do evento atual
 	int code;
 
+	//seleçao de personagem caso "Start Game" seja selecionado
+	if(!encerra)
+		selecao_personagem(player_1, player_2);
+
 
 	//roda até que o programa seja encerrado
 	while(!encerra){
@@ -63,7 +72,7 @@ int main(){
 			move_players(player_1, player_2, disp, pressed_keys);
 			al_clear_to_color(al_map_rgb(0,0,0));
 			imprime_vida(disp, player_1, player_2);
-			imprime_players(player_1, player_2, pressed_keys);
+			imprime_players(player_1, player_2, pressed_keys, dev_mode);
 			al_flip_display();
 		} else if(code == 10){ //tecla pressionada
 			//atualiza o controle de movimento dos personagens

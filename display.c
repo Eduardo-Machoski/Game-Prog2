@@ -140,7 +140,8 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 				atual = (atual + 1) % m->opcoes;
 			else if (event.keyboard.keycode == 84) //pressiona o botao para cima
 				atual = (atual - 1 + m->opcoes) % m->opcoes;
-			else if (event.keyboard.keycode == 67){//pressiona 'ENTER'
+			else if (event.keyboard.keycode == 67)
+			{//pressiona 'ENTER'
 				if(m->codes[atual] == MAIN_MENU)
 					retorno = main_menu(queue, disp, timer, true, p1, p2, keys);
 				else if(m->codes[atual] == EXIT_GAME)
@@ -168,11 +169,12 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 }
 
 //imprime ambos os players na tela
-void imprime_players(player *p1, player *p2, bool *keys){
+void imprime_players(player *p1, player *p2, bool *keys, bool hitbox){
+	if(hitbox){
 	//imprime hitbox
-	al_draw_rectangle(p1->x - p1->side / 2, p1->y - p1->height/2, p1->x + p1->side/2, p1->y + p1->height/2, al_map_rgb(0, 0, 255), 0);
-	al_draw_rectangle(p2->x - p2->side / 2, p2->y - p2->height/2, p2->x + p2->side/2, p2->y + p2->height/2, al_map_rgb(255, 0, 0), 0);
-
+		al_draw_rectangle(p1->x - p1->side / 2, p1->y - p1->height/2, p1->x + p1->side/2, p1->y + p1->height/2, al_map_rgb(0, 0, 255), 0);
+		al_draw_rectangle(p2->x - p2->side / 2, p2->y - p2->height/2, p2->x + p2->side/2, p2->y + p2->height/2, al_map_rgb(255, 0, 0), 0);
+	}
 	//seleciona a sprite correta a ser impressa nesse ciclo
 	seleciona_sprite(p1);
 	seleciona_sprite(p2);
@@ -182,24 +184,24 @@ void imprime_players(player *p1, player *p2, bool *keys){
 
 	//imprime os players
 	if(p1->olha_esquerda)
-		al_draw_scaled_bitmap(p1->sprite, 0, 0, p1->sprite_w, p1->sprite_h, p1->x - p1->side/2, p1->y - p1->height/2, p1->side, p1->height, ALLEGRO_MIN_LINEAR ^ ALLEGRO_FLIP_HORIZONTAL);	
+		al_draw_scaled_bitmap(p1->sprite, 0, 0, p1->sprite_w, p1->sprite_h, p1->x - p1->side_sprite/2, p1->y - p1->height_sprite/2, p1->side_sprite, p1->height_sprite, ALLEGRO_MIN_LINEAR ^ ALLEGRO_FLIP_HORIZONTAL);	
 	else
-		al_draw_scaled_bitmap(p1->sprite, 0, 0, p1->sprite_w, p1->sprite_h, p1->x - p1->side/2, p1->y - p1->height/2, p1->side, p1->height, ALLEGRO_MIN_LINEAR);
+		al_draw_scaled_bitmap(p1->sprite, 0, 0, p1->sprite_w, p1->sprite_h, p1->x - p1->side_sprite/2, p1->y - p1->height_sprite/2, p1->side_sprite, p1->height_sprite, ALLEGRO_MIN_LINEAR);
 	if(p2->olha_esquerda)
-		al_draw_scaled_bitmap(p2->sprite, 0, 0, p2->sprite_w, p2->sprite_h, p2->x - p2->side/2, p2->y - p2->height/2, p2->side, p2->height, ALLEGRO_MIN_LINEAR ^ ALLEGRO_FLIP_HORIZONTAL);
+		al_draw_scaled_bitmap(p2->sprite, 0, 0, p2->sprite_w, p2->sprite_h, p2->x - p2->side_sprite/2, p2->y - p2->height_sprite/2, p2->side_sprite, p2->height_sprite, ALLEGRO_MIN_LINEAR ^ ALLEGRO_FLIP_HORIZONTAL);
 	else
-		al_draw_scaled_bitmap(p2->sprite, 0, 0, p2->sprite_w, p2->sprite_h, p2->x - p2->side/2, p2->y - p2->height/2, p2->side, p2->height, ALLEGRO_MIN_LINEAR);
+		al_draw_scaled_bitmap(p2->sprite, 0, 0, p2->sprite_w, p2->sprite_h, p2->x - p2->side_sprite/2, p2->y - p2->height_sprite/2, p2->side_sprite, p2->height_sprite, ALLEGRO_MIN_LINEAR);
 }
 
 //imprime a barra de vida de ambos os players
 void imprime_vida(display_info *disp, player *p1, player *p2){
 	//vida do player1
-	al_draw_rectangle(disp->tam_x/15, disp->tam_y/30, disp->tam_x/3, disp->tam_y/12, al_map_rgb(255, 255, 255), 3);
-	al_draw_rectangle(disp->tam_x/15 + 2, disp->tam_y/30 + 1, (disp->tam_x/3 - 2) * p1->vida, disp->tam_y/12 - 2, al_map_rgb(255, 0, 0), 3);
+	al_draw_filled_rectangle(disp->tam_x/15, disp->tam_y/30, disp->tam_x/3, disp->tam_y/12, al_map_rgb(255, 255, 255));
+	al_draw_filled_rectangle(disp->tam_x/15 + 2, disp->tam_y/30 + 1, (disp->tam_x/3 - 2) * p1->vida, disp->tam_y/12 - 2, al_map_rgb(255, 0, 0));
 
 	//vida do player2
-	al_draw_rectangle(2 * disp->tam_x/3, disp->tam_y/30, disp->tam_x - disp->tam_x/15, disp->tam_y/12, al_map_rgb(255, 255, 255), 0);
-	al_draw_rectangle(2 * disp->tam_x/3 + 2 + (disp->tam_x/3 * (1 - p1->vida)), disp->tam_y/30 + 2, disp->tam_x - disp->tam_x/15 - 2, disp->tam_y/12 -2, al_map_rgb(255, 0, 0), 0);
+	al_draw_filled_rectangle(2 * disp->tam_x/3, disp->tam_y/30, disp->tam_x - disp->tam_x/15, disp->tam_y/12, al_map_rgb(255, 255, 255));
+	al_draw_filled_rectangle(2 * disp->tam_x/3 + 2 + (disp->tam_x/3 * (1 - p1->vida)), disp->tam_y/30 + 2, disp->tam_x - disp->tam_x/15 - 2, disp->tam_y/12 -2, al_map_rgb(255, 0, 0));
 }
 
 //destroi um display_info e todos os seus componentes

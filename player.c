@@ -10,31 +10,53 @@ player *cria_player(display_info *disp, int ini_x, bool esquerda){
 
 	//bitmap para as sprites
 	ALLEGRO_BITMAP *bitmap = NULL;
-	if(!(bitmap = al_load_bitmap("Sprites/Martial_Hero/Teste1.png")))
+	if(!(bitmap = al_load_bitmap("Sprites/Martial_Hero/sprite.png")))
 		exit(1);
 
-	ALLEGRO_BITMAP *sprite = NULL;
-	if(!(sprite = al_create_sub_bitmap(bitmap, 0, 0, al_get_bitmap_width(bitmap)/4, al_get_bitmap_height(bitmap))))
+	//abre a file com informações das sprites
+	FILE *file;
+	const char *name = "./Sprites/Martial_Hero/info.txt";
+	if(!(file = fopen(name, "r")))
 		exit(1);
+
+
+	int num_sprites;
+	fscanf(file, "%d", &num_sprites);
+
+	int width = al_get_bitmap_width(bitmap)/num_sprites;
+	int height = al_get_bitmap_height(bitmap);
+
+	ALLEGRO_BITMAP *sprite = NULL;
+	if(!(sprite = al_create_sub_bitmap(bitmap, 0, 0, width, height)))
+		exit(1);
+
+	int tam_x, tam_y;
+	fscanf(file, "%d %d", &tam_x, &tam_y);
 
 	//inicializa o player
 	aux->side = disp->tam_x / 16;
+	aux->side_sprite = (disp->tam_x / 16) * (width/tam_x);	
 	aux->height = disp->tam_x / 8;
-	aux->vida = 0.90;
+	aux->height_sprite = (disp->tam_x / 8) * (height/tam_y);
+	aux->vida = 1;
 	aux->jump = false;
 	aux->jump_height = VELOCIDADE_MAX_Y;
 	aux->bitmap = bitmap;
 	aux->sprite = sprite;
 	aux->sprite_atual = 0;
-	aux->sprite_w = al_get_bitmap_width(bitmap) / 4;
-	aux->sprite_h = al_get_bitmap_height(bitmap);
+	aux->sprite_w = width;
+	aux->sprite_h = height;
 	aux->olha_esquerda = esquerda;
+	aux->num_sprites = num_sprites;
 
 	//posicao horizontal inicial (ini_x% da tela)
 	aux->x = disp->tam_x * (ini_x/100.0);
 
 	//inicializa os players no chao)
 	aux->y = disp->tam_y - disp->chao - aux->height/2;
+
+	//fecha a file de informacao
+	fclose(file);
 	return aux;
 }
 

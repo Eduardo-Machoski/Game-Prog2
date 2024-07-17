@@ -3,6 +3,7 @@
 
 #include<stdlib.h>
 #include<stdbool.h>
+#include<stdio.h>
 #include<allegro5/allegro.h>
 #include<allegro5/allegro_image.h>
 
@@ -10,7 +11,9 @@ typedef struct {
 	int x; //pos x do player
 	int y; //pos y do player
 	int side; //tamanho do lado do hitbox
+	int side_sprite; //tamanho do lado da sprite
 	int height; //altura do hitbox
+	int height_sprite; //altura da sprite
 	float vida; //vida atual
 	bool jump; //true se o player estiver pulando
 	float jump_height; //quantidade que o player deve pular se jump == true
@@ -21,6 +24,7 @@ typedef struct {
 	int sprite_w; //width da sprite
 	int sprite_h; //height da sprite
 	bool olha_esquerda; //indica se a sprite esta olhando para a esquerda
+	int num_sprites; //numero de sprites que o personagem possui
 } player;
 
 #include"display.h"

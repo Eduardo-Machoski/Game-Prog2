@@ -33,6 +33,13 @@ player *cria_player(display_info *disp, int ini_x, bool esquerda){
 	int tam_x, tam_y;
 	fscanf(file, "%d %d", &tam_x, &tam_y);
 
+	int *indice_sprites;
+	if(!(indice_sprites = malloc(sizeof(int) * 7)))
+		exit(1);
+
+	for(int i = 0; i < 7; i++)
+		fscanf(file, "%d", &indice_sprites[i]);
+
 	//inicializa o player
 	aux->side = disp->tam_x / 16;
 	aux->side_sprite = (disp->tam_x / 16) * (width/tam_x);	
@@ -48,6 +55,7 @@ player *cria_player(display_info *disp, int ini_x, bool esquerda){
 	aux->sprite_h = height;
 	aux->olha_esquerda = esquerda;
 	aux->num_sprites = num_sprites;
+	aux->i_sprites = indice_sprites;
 
 	//posicao horizontal inicial (ini_x% da tela)
 	aux->x = disp->tam_x * (ini_x/100.0);
@@ -200,13 +208,33 @@ void colisao_players(player *p1, player *p2, bool *keys){
 
 //verifica o estado atual do player e retorna um subbitmap com a sprite atual que deve ser desenhada
 void seleciona_sprite(player *p){
+	int num;
+	if(p->jump){
+		if(p->jump_height >= 0){ //subida do pulo
+			num = 1;
+		} else {//queda do pulo
+			num = 2;
+		}
+	} else{ //idle
+		num = 0;
+	}
+
+	if(!(p->sprite_atual >= p->i_sprites[num] && (num == 6 || p->sprite_atual < p->i_sprites[num + 1]))){
+		p->sprite_atual = p->i_sprites[num];
+		p->tempo_ciclo = 0;
+	}
+
 	bool troca = false;
 	
 	//verifica se é necessario mudar a imagem por conta do tempo
-	if(p->tempo_ciclo >= 5){
-		int num_sprites = 4;
+	if(p->tempo_ciclo >= 3){
+		int num_sprites;
+		if(num < 6)
+			num_sprites = p->i_sprites[num + 1] - p->i_sprites[num];
+		else
+			num_sprites = p->num_sprites - p->i_sprites[num];
 		//troca o indice da imagem (depende de qual animaçao esta ocorrendo no momento)
-		p->sprite_atual = (p->sprite_atual + 1) % num_sprites;
+		p->sprite_atual = p->i_sprites[num] + ((p->sprite_atual + 1) % num_sprites);
 		troca = true;
 
 		//reinicia o tempo do ciclo atual

@@ -11,9 +11,9 @@ typedef struct {
 	int x; //pos x do player
 	int y; //pos y do player
 	int side; //tamanho do lado do hitbox
-	int side_sprite; //tamanho do lado da sprite
+	int side_sprite; //tamanho do lado do hitbox da sprite
 	int height; //altura do hitbox
-	int height_sprite; //altura da sprite
+	int height_sprite; //altura da hitbox na sprite
 	float vida; //vida atual
 	bool jump; //true se o player estiver pulando
 	float jump_height; //quantidade que o player deve pular se jump == true
@@ -25,6 +25,7 @@ typedef struct {
 	int sprite_h; //height da sprite
 	bool olha_esquerda; //indica se a sprite esta olhando para a esquerda
 	int num_sprites; //numero de sprites que o personagem possui
+	int *i_sprites; //indica o indice inicial de cada grupo de sprits em uma animacao
 } player;
 
 #include"display.h"

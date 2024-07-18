@@ -10,12 +10,12 @@ player *cria_player(display_info *disp, int ini_x, bool esquerda){
 
 	//bitmap para as sprites
 	ALLEGRO_BITMAP *bitmap = NULL;
-	if(!(bitmap = al_load_bitmap("Sprites/Martial_Hero/sprite.png")))
+	if(!(bitmap = al_load_bitmap("Sprites/Martial_Hero_3/sprite.png")))
 		exit(1);
 
 	//abre a file com informações das sprites
 	FILE *file;
-	const char *name = "./Sprites/Martial_Hero/info.txt";
+	const char *name = "./Sprites/Martial_Hero_3/info.txt";
 	if(!(file = fopen(name, "r")))
 		exit(1);
 
@@ -61,6 +61,7 @@ player *cria_player(display_info *disp, int ini_x, bool esquerda){
 	aux->i_sprites = indice_sprites;
 	aux->attack = 0;
 	aux->recuo = false;
+	aux->crouch = false;
 
 	//posicao horizontal inicial (ini_x% da tela)
 	aux->x = disp->tam_x * (ini_x/100.0);

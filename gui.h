@@ -25,7 +25,7 @@ typedef struct {
 menus *cria_menu(int tam);
 
 //menu principal do jogo
-bool main_menu(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *timer, bool reset, player *p1, player *p2, bool keys[]);
+	bool main_menu(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *timer, bool reset, player *p1, player *p2, bool keys[]);
 
 void selecao_personagem(player *p1, player *p2);
 

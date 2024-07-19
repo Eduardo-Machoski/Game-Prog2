@@ -25,8 +25,9 @@ typedef struct {
 	bool olha_esquerda; //indica se a sprite esta olhando para a esquerda
 	bool jump; //true se o player estiver pulando
 	bool crouch; //true se o player estiver agachado
-	char attack; //indica se um ataque esta sendo realizado
 	bool recuo; //indica se o player esta em estado de recuo apos receber um ataque
+	bool attack_done; //indica se um ataque ja foi concluido
+	char attack; //indica se um ataque esta sendo realizado e qual (0 se nao)
 	ALLEGRO_BITMAP *bitmap; //bitmap com todas as sprites do player
 	ALLEGRO_BITMAP *sprite; //bitmap com a ultima sprite impressa do player
 } player;
@@ -39,6 +40,9 @@ typedef struct {
 
 //cria a estrutura guardando as informações do player e inicializa ela
 player *cria_player(display_info *disp, int x_ini, bool esquerda);
+
+//verifica se o player pode atacar no momento, se sim atualiza o p->attack para indicar isso
+void verifica_ataque(player *p1, player *p2, bool *keys);
 
 //atualiza a posicao x e y dos players a partir dos seus controles
 void move_players(player *p1, player *p2, display_info *disp, bool *keys);

@@ -27,7 +27,7 @@ display_info *cria_display(){
 	//inicializa os valores da estrutura
 	new_display->tam_x = aux->width;
 	new_display->tam_y = aux->height;
-	new_display->chao = aux->height /4;
+	new_display->chao = aux->height /7;
 	new_display->full = true;
 
 	//destroi o auxiliar
@@ -95,7 +95,7 @@ void full_screen(display_info *d, bool borda){
 }
 
 //imprime um menu na tela e obtem inputs do usuario para realizar as operaçoes disponiveis em cada menu
-bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER *timer, player *p1, player *p2, bool keys[]){
+bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER *timer, player *p1, player *p2, bool keys[], ALLEGRO_BITMAP *background){
 
 	//apaga todos os eventos em queue antes do menu ser aberto	
 	al_flush_event_queue(queue);
@@ -143,7 +143,7 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 			else if (event.keyboard.keycode == 67)
 			{//pressiona 'ENTER'
 				if(m->codes[atual] == MAIN_MENU)
-					retorno = main_menu(queue, disp, timer, true, p1, p2, keys);
+					retorno = main_menu(queue, disp, timer, true, p1, p2, keys, background);
 				else if(m->codes[atual] == EXIT_GAME)
 					retorno = true;
 				continua = false;
@@ -191,6 +191,11 @@ void imprime_players(player *p1, player *p2, bool *keys, bool hitbox){
 		al_draw_scaled_bitmap(p2->sprite, 0, 0, p2->sprite_w, p2->sprite_h, p2->x - p2->side_sprite/2, p2->y - p2->height_sprite/2, p2->side_sprite, p2->height_sprite, ALLEGRO_MIN_LINEAR ^ ALLEGRO_FLIP_HORIZONTAL);
 	else
 		al_draw_scaled_bitmap(p2->sprite, 0, 0, p2->sprite_w, p2->sprite_h, p2->x - p2->side_sprite/2, p2->y - p2->height_sprite/2, p2->side_sprite, p2->height_sprite, ALLEGRO_MIN_LINEAR);
+}
+
+//imprime o background selecionado (tamanho da sprite 3440x1440 pixels)
+void imprime_background(ALLEGRO_BITMAP *background, display_info *disp){
+	al_draw_scaled_bitmap(background, 0, 0, al_get_bitmap_width(background), al_get_bitmap_height(background), 0, 0, disp->tam_x, disp->tam_y, ALLEGRO_MIN_LINEAR);
 }
 
 //imprime a barra de vida de ambos os players

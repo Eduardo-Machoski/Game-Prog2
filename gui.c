@@ -33,7 +33,7 @@ menus *cria_menu(int tam){
 }
 
 //menu principal do jogo
-bool main_menu(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *timer, bool reset, player *p1, player *p2, bool keys[]){
+bool main_menu(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *timer, bool reset, player *p1, player *p2, bool keys[], ALLEGRO_BITMAP *background){
 	//cria o menu que sera usado no display
 	menus *m;
 	if(!(m = cria_menu(2)))
@@ -52,11 +52,11 @@ bool main_menu(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *ti
        	m->codes[1] = EXIT_GAME;
 	
 	//mostra o menu e realiza a operacao desejada pelo usuario
-	bool aux = display_menu(m, disp, queue, timer, p1, p2, keys);
+	bool aux = display_menu(m, disp, queue, timer, p1, p2, keys, background);
 
 	//menu aberto apos uma partida ter sido iniciada
 	if(reset)
-		selecao_personagem(p1, p2);
+		selecao_personagem(disp, p1, p2, background);
 
 	//destroi o menu apos o seu uso
 	destroy_menu(m);
@@ -64,12 +64,12 @@ bool main_menu(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *ti
 	return aux;
 }
 
-void selecao_personagem(player *p1, player *p2){
-	return;	
+void selecao_personagem(display_info *disp, player *p1, player *p2, ALLEGRO_BITMAP *background){
+	return;
 }
 
 //pausa o jogo, removendo todos os inputs ainda nao processados
-bool pause_gui(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *timer, player *p1, player *p2, bool keys[]){
+bool pause_gui(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *timer, player *p1, player *p2, bool keys[], ALLEGRO_BITMAP *background){
 
 	//cria o menu que sera usado no display
 	menus *m;
@@ -92,7 +92,7 @@ bool pause_gui(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *ti
 	m->codes[2] = EXIT_GAME;
 
 	//mostra o menu e realiza a operacao desejada pelo usuario
-	bool aux = display_menu(m, disp, queue, timer, p1, p2, keys);
+	bool aux = display_menu(m, disp, queue, timer, p1, p2, keys, background);
 
 	//destroi o menu apos o seu uso
 	destroy_menu(m);

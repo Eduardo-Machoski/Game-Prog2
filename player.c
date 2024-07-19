@@ -62,6 +62,7 @@ player *cria_player(display_info *disp, int ini_x, bool esquerda){
 	aux->attack = 0;
 	aux->recuo = false;
 	aux->crouch = false;
+	aux->attack_done = true;
 
 	//posicao horizontal inicial (ini_x% da tela)
 	aux->x = disp->tam_x * (ini_x/100.0);
@@ -74,26 +75,58 @@ player *cria_player(display_info *disp, int ini_x, bool esquerda){
 	return aux;
 }
 
+//verifica se o player pode atacar no momento, se sim atualiza o p->attack para indicar isso
+void verifica_ataque(player *p1, player *p2, bool *keys){
+	if(!p1->jump && !p1->crouch && p1->attack == 0){ //verifica se o p1 pode atacar
+		if(keys[26]){//ataque baixo
+			p1->attack = 1;
+			p1->attack_done = false;
+		}
+		if(keys[24]){//ataque alto
+			p1->attack = 2;
+			p1->attack_done = false;
+		}
+	}
 
+	if(p1->attack_done)//se o ataque terminou reseta o p1->attack
+		p1->attack = 0;
+	
+	if(!p2->jump && !p2->crouch && p2->attack == 0){//verifica se o p2 pode atacar
+		if(keys[73]){//ataque baixo
+			p2->attack = 1;
+			p2->attack_done = false;
+		}
+		if(keys[68]){//ataque alto
+			p2->attack = 2;
+			p2->attack_done = false;
+		}
+	}
+
+	if(p2->attack_done)
+		p2->attack = 0;
+}
 
 //atualiza a posicao x e y dos players a partir de seus controles
 void move_players(player *p1, player *p2, display_info  *disp, bool *keys){
 
 	int half_side_p1 = p1->side/2;
 	int half_side_p2 = p2->side/2;
-
-	//atualiza a posicao x do player1
-	p1->x += VELOCIDADE_X * (keys[4] - keys[1]);
-	//verifica colisao do player1 com a borda da tela nas laterais
-	if(p1->x < half_side_p1 || p1->x > disp->tam_x - half_side_p1)
-		p1->x = half_side_p1 * keys[1] + (disp->tam_x - half_side_p1) * keys[4];
-
 	
-	//atualiza a posicao x do player2
-	p2->x += VELOCIDADE_X * (keys[83] - keys[82]);
-	//verifica colisao do player2 com a borda da tela nas lateraiss
-	if(p2->x < half_side_p2 || p2->x > disp->tam_x - half_side_p2)
-		p2->x = half_side_p2 * keys[82] + (disp->tam_x - half_side_p2) * keys[83];
+	if(p1->attack == 0){
+		//atualiza a posicao x do player1
+		p1->x += VELOCIDADE_X * (keys[4] - keys[1]);
+		//verifica colisao do player1 com a borda da tela nas laterais
+		if(p1->x < half_side_p1 || p1->x > disp->tam_x - half_side_p1)
+			p1->x = half_side_p1 * keys[1] + (disp->tam_x - half_side_p1) * keys[4];
+	}
+
+	if(p2->attack == 0){	
+		//atualiza a posicao x do player2
+		p2->x += VELOCIDADE_X * (keys[83] - keys[82]);
+		//verifica colisao do player2 com a borda da tela nas lateraiss
+		if(p2->x < half_side_p2 || p2->x > disp->tam_x - half_side_p2)
+			p2->x = half_side_p2 * keys[82] + (disp->tam_x - half_side_p2) * keys[83];
+	}
 
 	//verifica se o p1 esta saltando
 	if(p1->jump){
@@ -221,8 +254,16 @@ void seleciona_sprite(player *p){
 		} else {//queda do pulo
 			num = 2;
 		}
-	} else{ //idle
+	} else if (p->attack == 0){ //idle
 		num = 0;
+	} else if (p->attack == 1){ //ataque baixo
+		num = 3;
+		if(p->sprite_atual + 1 == p->i_sprites[4])
+			p->attack_done = true;
+	} else if (p->attack == 2){ //ataque alto
+		num = 4;
+		if(p->sprite_atual + 1 == p->i_sprites[5])
+			p->attack_done = true;
 	}
 
 	if(!(p->sprite_atual >= p->i_sprites[num] && (num == 6 || p->sprite_atual < p->i_sprites[num + 1]))){
@@ -233,7 +274,7 @@ void seleciona_sprite(player *p){
 	bool troca = false;
 	
 	//verifica se é necessario mudar a imagem por conta do tempo
-	if(p->tempo_ciclo >= 3){
+	if(p->tempo_ciclo >= 5){
 		int num_sprites;
 		if(num < 6)
 			num_sprites = p->i_sprites[num + 1] - p->i_sprites[num];

@@ -37,10 +37,13 @@ int main(int argc, char *argv[]){
 
 	//controle de movimento dos personagens
 	bool pressed_keys[ALLEGRO_KEY_MAX] = {false};
+	
+	//background a ser selecionado na selecao de personagens
+	ALLEGRO_BITMAP *background = NULL;
 
 	//abre o menu principal no inicio do jogo
 	//caso a variavel encerra == true, encerra o programa
-	bool encerra = main_menu(queue, disp, timer, false, NULL, NULL, pressed_keys);
+	bool encerra = main_menu(queue, disp, timer, false, NULL, NULL, pressed_keys, background);
 	
 	//começa o relogio do programa
 	al_start_timer(timer);
@@ -56,9 +59,13 @@ int main(int argc, char *argv[]){
 	//codigo do evento atual
 	int code;
 
+	if(!(background = al_load_bitmap("Sprites/Background/background_2.png")))
+		exit(1);
+
 	//seleçao de personagem caso "Start Game" seja selecionado
+	//seleciona background tambem
 	if(!encerra)
-		selecao_personagem(player_1, player_2);
+		selecao_personagem(disp, player_1, player_2, background);
 
 
 	//roda até que o programa seja encerrado
@@ -69,8 +76,9 @@ int main(int argc, char *argv[]){
 		
 		//tick do timer
 		if(code == 30){
+			verifica_ataque(player_1, player_2, pressed_keys);
 			move_players(player_1, player_2, disp, pressed_keys);
-			al_clear_to_color(al_map_rgb(0,0,0));
+			imprime_background(background, disp);
 			imprime_vida(disp, player_1, player_2);
 			imprime_players(player_1, player_2, pressed_keys, dev_mode);
 			al_flip_display();
@@ -92,7 +100,7 @@ int main(int argc, char *argv[]){
 
 			//pressiona 'esc' para pausar o jogo e abrir o menu de pausa
 			if(event.keyboard.keycode == 59)
-				encerra = pause_gui(queue, disp, timer, player_1, player_2, pressed_keys);
+				encerra = pause_gui(queue, disp, timer, player_1, player_2, pressed_keys, background);
 
 		} else if(code == 12){ // tecla liberada
 			//atualiza o controle de movimento dos personagens

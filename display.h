@@ -24,10 +24,13 @@ display_info *cria_display();
 void full_screen(display_info *d, bool borda);
 
 //imprime um menu na tela e obtem inputs do usuario para realizar as operaçoes disponiveis em cada menu
-bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER *timer, player *p1, player *p2, bool keys[]);
+bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER *timer, player *p1, player *p2, bool keys[], ALLEGRO_BITMAP *background);
 
 //imprime ambos os players na tela
 void imprime_players(player *p1, player *p2, bool *keys, bool hitbox);
+
+//imprime o background selecionado (tamanho da sprite 3440x1440 pixels)
+void imprime_background(ALLEGRO_BITMAP *background, display_info *disp);
 
 //imprime a barra de vida de ambos os players
 void imprime_vida(display_info *disp, player *p1, player *p2);

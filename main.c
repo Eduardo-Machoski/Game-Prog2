@@ -86,7 +86,7 @@ int main(int argc, char *argv[]){
 			//atualiza o controle de movimento dos personagens
 			pressed_keys[event.keyboard.keycode] = pressed_keys[event.keyboard.keycode] ^ 1;
 
-			printf("%d", event.keyboard.keycode);
+			//printf("%d", event.keyboard.keycode);
 
 			//pressiona 'f11' para obter tela full-screen
 			if(event.keyboard.keycode == 57){

@@ -19,6 +19,7 @@ typedef struct {
 	int sprite_w; //width da sprite
 	int sprite_h; //height da sprite
 	int num_sprites; //numero de sprites que o personagem possui
+	int frames; //numero de frames para cada sprite
 	int *i_sprites; //indica o indice inicial de cada grupo de sprits em uma animacao
 	float vida; //vida atual
 	float jump_height; //quantidade que o player deve pular se jump == true

@@ -10,12 +10,12 @@ player *cria_player(display_info *disp, int ini_x, bool esquerda){
 
 	//bitmap para as sprites
 	ALLEGRO_BITMAP *bitmap = NULL;
-	if(!(bitmap = al_load_bitmap("Sprites/Martial_Hero_3/sprite.png")))
+	if(!(bitmap = al_load_bitmap("Sprites/Fantasy_Warrior/sprite.png")))
 		exit(1);
 
 	//abre a file com informações das sprites
 	FILE *file;
-	const char *name = "./Sprites/Martial_Hero_3/info.txt";
+	const char *name = "./Sprites/Fantasy_Warrior/info.txt";
 	if(!(file = fopen(name, "r")))
 		exit(1);
 
@@ -43,6 +43,9 @@ player *cria_player(display_info *disp, int ini_x, bool esquerda){
 	for(int i = 0; i < 7; i++)
 		fscanf(file, "%d", &indice_sprites[i]);
 
+	int frames;
+	fscanf(file, "%d", &frames);
+
 	//inicializa o player
 	aux->side = disp->tam_x / 16;
 	aux->side_sprite = (disp->tam_x / 16) * (width/tam_x);	
@@ -63,6 +66,7 @@ player *cria_player(display_info *disp, int ini_x, bool esquerda){
 	aux->recuo = false;
 	aux->crouch = false;
 	aux->attack_done = true;
+	aux->frames = frames;
 
 	//posicao horizontal inicial (ini_x% da tela)
 	aux->x = disp->tam_x * (ini_x/100.0);
@@ -88,9 +92,6 @@ void verifica_ataque(player *p1, player *p2, bool *keys){
 		}
 	}
 
-	if(p1->attack_done)//se o ataque terminou reseta o p1->attack
-		p1->attack = 0;
-	
 	if(!p2->jump && !p2->crouch && p2->attack == 0){//verifica se o p2 pode atacar
 		if(keys[73]){//ataque baixo
 			p2->attack = 1;
@@ -101,9 +102,6 @@ void verifica_ataque(player *p1, player *p2, bool *keys){
 			p2->attack_done = false;
 		}
 	}
-
-	if(p2->attack_done)
-		p2->attack = 0;
 }
 
 //atualiza a posicao x e y dos players a partir de seus controles
@@ -163,7 +161,7 @@ void move_players(player *p1, player *p2, display_info  *disp, bool *keys){
 		p2->jump = true;
 
 	//verifica e arruma colisao entre players
-	colisao_players(p1, p2, keys);
+	//colisao_players(p1, p2, keys);
 
 	return;
 }
@@ -258,30 +256,31 @@ void seleciona_sprite(player *p){
 		num = 0;
 	} else if (p->attack == 1){ //ataque baixo
 		num = 3;
-		if(p->sprite_atual + 1 == p->i_sprites[4])
-			p->attack_done = true;
 	} else if (p->attack == 2){ //ataque alto
 		num = 4;
-		if(p->sprite_atual + 1 == p->i_sprites[5])
-			p->attack_done = true;
 	}
+	bool troca = false;
 
 	if(!(p->sprite_atual >= p->i_sprites[num] && (num == 6 || p->sprite_atual < p->i_sprites[num + 1]))){
 		p->sprite_atual = p->i_sprites[num];
 		p->tempo_ciclo = 0;
+		troca = true;
 	}
 
-	bool troca = false;
+	if(p->attack != 0 && p->sprite_atual +1 == p->i_sprites[num + 1] && p->tempo_ciclo >= p->frames - 1){
+		p->attack_done = true;
+		p->attack = 0;
+	}
 	
 	//verifica se é necessario mudar a imagem por conta do tempo
-	if(p->tempo_ciclo >= 5){
+	if(p->tempo_ciclo >= p->frames){
 		int num_sprites;
 		if(num < 6)
 			num_sprites = p->i_sprites[num + 1] - p->i_sprites[num];
 		else
 			num_sprites = p->num_sprites - p->i_sprites[num];
 		//troca o indice da imagem (depende de qual animaçao esta ocorrendo no momento)
-		p->sprite_atual = p->i_sprites[num] + ((p->sprite_atual + 1) % num_sprites);
+		p->sprite_atual = p->i_sprites[num] + ((p->sprite_atual - p->i_sprites[num] + 1) % num_sprites);
 		troca = true;
 
 		//reinicia o tempo do ciclo atual

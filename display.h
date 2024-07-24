@@ -35,6 +35,9 @@ void imprime_background(ALLEGRO_BITMAP *background, display_info *disp);
 //imprime a barra de vida de ambos os players
 void imprime_vida(display_info *disp, player *p1, player *p2);
 
+//imprime a tela de selecao e qual a opcao atual dos players (baseado em p1_x p1_y...)
+void imprime_selecao(display_info *disp, int p1_x, int p1_y, int p2_x, int p2_y, int back);
+
 //destroi um display_info e todos os seus componentes
 void destroy_display_info(display_info *d);
 

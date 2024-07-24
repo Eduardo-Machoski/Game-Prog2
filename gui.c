@@ -56,7 +56,7 @@ bool main_menu(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *ti
 
 	//menu aberto apos uma partida ter sido iniciada
 	if(reset)
-		selecao_personagem(disp, p1, p2, background);
+		selecao_personagem(disp, p1, p2, background, queue);
 
 	//destroi o menu apos o seu uso
 	destroy_menu(m);
@@ -64,8 +64,28 @@ bool main_menu(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *ti
 	return aux;
 }
 
-void selecao_personagem(display_info *disp, player *p1, player *p2, ALLEGRO_BITMAP *background){
-	return;
+void selecao_personagem(display_info *disp, player *p1, player *p2, ALLEGRO_BITMAP *background, ALLEGRO_EVENT_QUEUE *queue){
+	int p1_x = 0;
+	int p1_y = 0;
+	int p2_x = 1;
+	int p2_y = 0;
+
+	int back = 0;
+
+	imprime_selecao(disp, p1_x, p1_y, p2_x, p2_y, back);
+
+	ALLEGRO_EVENT event;
+	al_wait_for_event(queue, &event);
+	while(!(event.type == 10 && event.keyboard.keycode == 67)){
+		al_wait_for_event(queue, &event);
+		if(event.type == 10){
+			if(event.keyboard.keycode == 1 || event.keyboard.keycode == 4)
+				p1_x = p1_x ^ 1;
+			else if(event.keyboard.keycode == 85 || event.keyboard.keycode == 84)
+				p2_y = p2_y ^ 1;
+		}
+		imprime_selecao(disp, p1_x, p1_y, p2_x, p2_y, back);
+	}
 }
 
 //pausa o jogo, removendo todos os inputs ainda nao processados

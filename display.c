@@ -225,6 +225,14 @@ void imprime_vida(display_info *disp, player *p1, player *p2){
 	al_draw_filled_rectangle(2 * disp->tam_x/3 + 2 + (disp->tam_x/3 * (1 - p1->vida)), disp->tam_y/30 + 2, disp->tam_x - disp->tam_x/15 - 2, disp->tam_y/12 -2, al_map_rgb(255, 0, 0));
 }
 
+void imprime_selecao(display_info *disp, int p1_x, int p1_y, int p2_x, int p2_y, int back){
+	al_draw_rectangle(disp->tam_x/2 - ((disp->tam_x/8) * 2), disp->tam_y/5 - 4, disp->tam_x/2 -disp->tam_x/8, disp->tam_y/5 * 2 - 4, al_map_rgb(255, 255, 0), 4); 
+	al_draw_rectangle(disp->tam_x/2 + disp->tam_x/8, disp->tam_y/5 - 4, disp->tam_x/2 + ((disp->tam_x/8) * 2), disp->tam_y/5 * 2 - 4, al_map_rgb(255, 255, 255), 4); 
+//	al_draw_rectangle(disp->tam_x/6 * (1 + i), disp->tam_y/15 * (1 + j), disp->tam_x/6 *(2 + 1), disp->tam_y/15 * (2 + j), al_map_rgb(255, 255, 255), 4); 
+//	al_draw_rectangle(disp->tam_x/6 * (1 + i), disp->tam_y/15 * (1 + j), disp->tam_x/6 *(2 + 1), disp->tam_y/15 * (2 + j), al_map_rgb(255, 255, 255), 4); 
+	al_flip_display();
+}
+
 //destroi um display_info e todos os seus componentes
 void destroy_display_info(display_info *d){
 	//destroi o display do allegro

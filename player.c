@@ -295,12 +295,14 @@ void seleciona_sprite(player *p){
 	}
 	bool troca = false;
 
+	//verifica se o estado (jump, idle...) mudou
 	if(!(p->sprite_atual >= p->i_sprites[num] && (num == 6 || p->sprite_atual < p->i_sprites[num + 1]))){
 		p->sprite_atual = p->i_sprites[num];
 		p->tempo_ciclo = 0;
 		troca = true;
 	}
 
+	//verifica se o ataque acabou
 	if(p->attack != 0 && p->sprite_atual +1 == p->i_sprites[num + 1] && p->tempo_ciclo >= p->frames - 1){
 		p->attack_done = true;
 		p->attack = 0;
@@ -336,15 +338,15 @@ void seleciona_sprite(player *p){
 //verifica qual a orientacao dos players (esquerda ou direita)
 void orientacao_players(player *p1, player *p2, bool *keys){
 	//orientaçao do p1
-	if(keys[1] && !keys[4])
+	if(p1-> attack == 0 && keys[1] && !keys[4])
 		p1->olha_esquerda = true;
-	else if(!keys[1] && keys[4])
+	else if(p1->attack == 0 && !keys[1] && keys[4])
 		p1->olha_esquerda = false;
 
 	//orientacao do p2
-	if(keys[82] && !keys[83])
+	if(p2->attack == 0 && keys[82] && !keys[83])
 		p2->olha_esquerda = true;
-	else if(keys[83] && !keys[82])
+	else if(p2->attack == 0 && keys[83] && !keys[82])
 		p2->olha_esquerda = false;
 }
 

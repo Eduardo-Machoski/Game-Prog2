@@ -45,9 +45,6 @@ int main(int argc, char *argv[]){
 	//caso a variavel encerra == true, encerra o programa
 	bool encerra = main_menu(queue, disp, timer, false, NULL, NULL, pressed_keys, background);
 	
-	//começa o relogio do programa
-	al_start_timer(timer);
-
 
 	//cria amobos os players
 	player *player_1 = cria_player(disp, 10, false);
@@ -65,7 +62,10 @@ int main(int argc, char *argv[]){
 	//seleçao de personagem caso "Start Game" seja selecionado
 	//seleciona background tambem
 	if(!encerra)
-		selecao_personagem(disp, player_1, player_2, background);
+		selecao_personagem(disp, player_1, player_2, background, queue);
+
+	//começa o relogio do programa
+	al_start_timer(timer);
 
 
 	//roda até que o programa seja encerrado
@@ -84,9 +84,10 @@ int main(int argc, char *argv[]){
 			al_flip_display();
 		} else if(code == 10){ //tecla pressionada
 			//atualiza o controle de movimento dos personagens
-			pressed_keys[event.keyboard.keycode] = pressed_keys[event.keyboard.keycode] ^ 1;
+			pressed_keys[event.keyboard.keycode] = 1;
 
-			//printf("%d", event.keyboard.keycode);
+			if(dev_mode)
+				printf("%d", event.keyboard.keycode);
 
 			//pressiona 'f11' para obter tela full-screen
 			if(event.keyboard.keycode == 57){
@@ -104,7 +105,7 @@ int main(int argc, char *argv[]){
 
 		} else if(code == 12){ // tecla liberada
 			//atualiza o controle de movimento dos personagens
-			pressed_keys[event.keyboard.keycode] = pressed_keys[event.keyboard.keycode] ^ 1;
+			pressed_keys[event.keyboard.keycode] = 0;
 		} else if(code == 42) //botao de fechar pressionado
 			encerra = true;
 	}

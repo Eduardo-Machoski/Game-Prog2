@@ -8,6 +8,11 @@
 #include<allegro5/allegro_image.h>
 
 typedef struct {
+	int *i_sprites; //indica o indice inicial de cada grupo de sprits em uma animacao
+	int *attack_1; //tamanho do hitbox do ataque_1 (baixo)
+	int *attack_2; //tamanho do hitbox do ataque_2 (alto)
+	float vida; //vida atual
+	float jump_height; //quantidade que o player deve pular se jump == true
 	int x; //pos x do player
 	int y; //pos y do player
 	int side; //tamanho do lado do hitbox
@@ -20,9 +25,6 @@ typedef struct {
 	int sprite_h; //height da sprite
 	int num_sprites; //numero de sprites que o personagem possui
 	int frames; //numero de frames para cada sprite
-	int *i_sprites; //indica o indice inicial de cada grupo de sprits em uma animacao
-	float vida; //vida atual
-	float jump_height; //quantidade que o player deve pular se jump == true
 	bool olha_esquerda; //indica se a sprite esta olhando para a esquerda
 	bool jump; //true se o player estiver pulando
 	bool crouch; //true se o player estiver agachado
@@ -50,6 +52,9 @@ void move_players(player *p1, player *p2, display_info *disp, bool *keys);
 
 //verifica e corrige colisao entre players
 void colisao_players(player *p1, player *p2, bool *keys);
+
+//caso atacando esteja realizando o attack_1 (baixo) verifica se houve hit na vitima
+void attack_1(player *atacando, player *vitima);
 
 //verifica o estado atual do player e atualiza p->sprite com a sprite atual que deve ser desenhada
 void seleciona_sprite(player *p);

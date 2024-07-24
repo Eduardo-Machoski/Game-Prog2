@@ -174,6 +174,22 @@ void imprime_players(player *p1, player *p2, bool *keys, bool hitbox){
 	//imprime hitbox
 		al_draw_rectangle(p1->x - p1->side / 2, p1->y - p1->height/2, p1->x + p1->side/2, p1->y + p1->height/2, al_map_rgb(0, 0, 255), 0);
 		al_draw_rectangle(p2->x - p2->side / 2, p2->y - p2->height/2, p2->x + p2->side/2, p2->y + p2->height/2, al_map_rgb(255, 0, 0), 0);
+
+		//hitbox attack_1 p1
+		if((p1->attack == 1)){
+			if(p1->olha_esquerda)
+				al_draw_rectangle(p1->x - p1->side/2 - p1->attack_1[0], p1->y - p1->attack_1[1]/2, p1->x - p1->side/2, p1->y + p1->attack_1[1]/2, al_map_rgb(255,0,0), 1);
+			else
+				al_draw_rectangle(p1->x + p1->side/2 + p1->attack_1[0], p1->y - p1->attack_1[1]/2, p1->x + p1->side/2, p1->y + p1->attack_1[1]/2, al_map_rgb(255,0,0), 1);
+		}
+
+		//hitbox attack_1 p2
+		if((p2->attack == 1)){
+			if(p2->olha_esquerda)
+				al_draw_rectangle(p2->x - p2->side/2 - p2->attack_1[0], p2->y - p2->attack_1[1]/2, p2->x - p2->side/2, p2->y + p2->attack_1[1]/2, al_map_rgb(255,0,0), 1);
+			else
+				al_draw_rectangle(p2->x + p2->side/2 + p2->attack_1[0], p2->y - p2->attack_1[1]/2, p2->x + p2->side/2, p2->y + p2->attack_1[1]/2, al_map_rgb(255,0,0), 1);
+		}
 	}
 	//seleciona a sprite correta a ser impressa nesse ciclo
 	seleciona_sprite(p1);

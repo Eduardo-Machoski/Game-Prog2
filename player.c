@@ -46,11 +46,26 @@ player *cria_player(display_info *disp, int ini_x, bool esquerda){
 	int frames;
 	fscanf(file, "%d", &frames);
 
+	//tamanhos do hitbox de cada ataque
+	int *attack_1, *attack_2;
+	if(!(attack_1 = malloc(sizeof(int) * 2)))
+		exit(1);
+
+	if(!(attack_2 = malloc(sizeof(int) * 2)))
+		exit(1);
+
+	fscanf(file, "%d %d", &attack_1[0], &attack_1[1]);
+	fscanf(file, "%d %d", &attack_2[0], &attack_2[1]);
+
+	attack_1[0] = (disp->tam_x/8) * (attack_1[0]/(float)width);
+	attack_1[1] = (disp->tam_x/8) * (attack_1[1]/(float)width);
+
+
 	//inicializa o player
 	aux->side = disp->tam_x / 16;
 	aux->side_sprite = (disp->tam_x / 16) * (width/tam_x);	
-	aux->height = disp->tam_x / 8;
-	aux->height_sprite = (disp->tam_x / 8) * (height/tam_y);
+	aux->height = disp->tam_y / 4;
+	aux->height_sprite = (disp->tam_y / 4) * (height/tam_y);
 	aux->vida = 1;
 	aux->jump = false;
 	aux->jump_height = VELOCIDADE_MAX_Y;
@@ -67,6 +82,8 @@ player *cria_player(display_info *disp, int ini_x, bool esquerda){
 	aux->crouch = false;
 	aux->attack_done = true;
 	aux->frames = frames;
+	aux->attack_1 = attack_1;
+	aux->attack_2 = attack_2;
 
 	//posicao horizontal inicial (ini_x% da tela)
 	aux->x = disp->tam_x * (ini_x/100.0);
@@ -102,6 +119,10 @@ void verifica_ataque(player *p1, player *p2, bool *keys){
 			p2->attack_done = false;
 		}
 	}
+
+	//verifica hits dos ataques
+	attack_1(p1, p2);
+	attack_1(p2, p1);
 }
 
 //atualiza a posicao x e y dos players a partir de seus controles
@@ -243,6 +264,19 @@ void colisao_players(player *p1, player *p2, bool *keys){
 	}
 }
 
+//caso atacando esteja realizando o attack_1 verifica se houve hit na vitima
+void attack_1(player *atacando, player *vitima){
+	//player nao esta atacando
+	if(atacando->attack != 1)
+		return;
+
+	if((atacando->sprite_atual >= atacando->i_sprites[4] - 2) && atacando->olha_esquerda)
+		al_draw_rectangle(atacando->x - atacando->side/2 - atacando->attack_1[0], atacando->y - atacando->height/2, atacando->x - atacando->side/2, atacando->y + atacando->attack_1[1], al_map_rgb(255,0,0), 1);
+
+	if((atacando->sprite_atual >= atacando->i_sprites[4] - 2) && !atacando->olha_esquerda)
+		al_draw_rectangle(atacando->x + atacando->side/2 + atacando->attack_1[0], atacando->y - atacando->height/2, atacando->x + atacando->side/2, atacando->y + atacando->attack_1[1], al_map_rgb(255,0,0), 1);
+}
+
 //verifica o estado atual do player e retorna um subbitmap com a sprite atual que deve ser desenhada
 void seleciona_sprite(player *p){
 	int num;
@@ -318,6 +352,8 @@ void orientacao_players(player *p1, player *p2, bool *keys){
 void destroy_player(player *elem){
 	al_destroy_bitmap(elem->bitmap);
 	al_destroy_bitmap(elem->sprite);
+	free(elem->attack_1);
+	free(elem->attack_2);
 	free(elem->i_sprites);
 	free(elem);
 }

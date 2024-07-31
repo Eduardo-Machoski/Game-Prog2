@@ -28,7 +28,7 @@ menus *cria_menu(int tam);
 	bool main_menu(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *timer, bool reset, player *p1, player *p2, bool keys[], ALLEGRO_BITMAP *background);
 
 //selecao de personagens e background
-void selecao_personagem(display_info *disp, player *p1, player *p2, ALLEGRO_BITMAP *background, ALLEGRO_EVENT_QUEUE *queue);
+bool selecao_personagem(display_info *disp, player **p1, player **p2, ALLEGRO_BITMAP **background, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER *timer);
 
 //pausa o jogo, remove todos os innputs ainda nao processados
 bool pause_gui(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *timer, player *p1, player *p2, bool keys[], ALLEGRO_BITMAP *background);

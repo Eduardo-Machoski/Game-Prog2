@@ -37,7 +37,7 @@ display_info *cria_display(){
 }
 
 //torna o display full-screen se possivel (sem borda se borda = false, com borda se borda = true)
-void full_screen(display_info *d, bool borda){
+void full_screen(display_info *d, bool borda, ALLEGRO_EVENT_QUEUE *queue){
 
 	//cria a estrutura auxiliar ara verificar o tamanho da tela
 	ALLEGRO_DISPLAY_MODE *aux;
@@ -78,6 +78,9 @@ void full_screen(display_info *d, bool borda){
        	if(!(aux2 = al_create_display(aux->width, aux->height)))
 		return;
 
+	//retira o registro do display destruido
+	al_unregister_event_source(queue, al_get_display_event_source(d->disp));
+
 	//destroi o display antigo
 	al_destroy_display(d->disp);
 
@@ -92,6 +95,9 @@ void full_screen(display_info *d, bool borda){
 
 	//atualiza o display
 	al_flip_display();
+
+	//registra o novo display na queue
+	al_register_event_source(queue, al_get_display_event_source(d->disp));
 }
 
 //imprime um menu na tela e obtem inputs do usuario para realizar as operaçoes disponiveis em cada menu
@@ -119,7 +125,10 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 	bool continua = true;
 	while(continua){
 
-		al_clear_to_color(al_map_rgb(0, 0 , 0));
+		if(background != NULL){
+			imprime_background(background, disp);
+			imprime_players(p1, p2, keys, false, true);
+		}
 		//imprime as opçoes do menu
 		for(int i = 0; i < m->opcoes; i++){
 			if(i == atual) //opçao atualmente selecionada
@@ -169,7 +178,7 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 }
 
 //imprime ambos os players na tela
-void imprime_players(player *p1, player *p2, bool *keys, bool hitbox){
+void imprime_players(player *p1, player *p2, bool *keys, bool hitbox, bool pause){
 	if(hitbox){
 	//imprime hitbox
 		al_draw_rectangle(p1->x - p1->side / 2, p1->y - p1->height/2, p1->x + p1->side/2, p1->y + p1->height/2, al_map_rgb(0, 0, 255), 0);
@@ -191,10 +200,13 @@ void imprime_players(player *p1, player *p2, bool *keys, bool hitbox){
 				al_draw_rectangle(p2->x + p2->side/2 + p2->attack_1[0], p2->y - p2->attack_1[1]/2, p2->x + p2->side/2, p2->y + p2->attack_1[1]/2, al_map_rgb(255,0,0), 1);
 		}
 	}
-	//seleciona a sprite correta a ser impressa nesse ciclo
-	seleciona_sprite(p1);
-	seleciona_sprite(p2);
 
+	//verifica se o jogo nao esta pausado para mudar a sprite
+	if(!pause){
+		//seleciona a sprite correta a ser impressa nesse ciclo
+		seleciona_sprite(p1);
+		seleciona_sprite(p2);
+	}
 	//verifica qual a orientacao do player (esquerda ou direita)
 	orientacao_players(p1, p2, keys);
 
@@ -225,11 +237,27 @@ void imprime_vida(display_info *disp, player *p1, player *p2){
 	al_draw_filled_rectangle(2 * disp->tam_x/3 + 2 + (disp->tam_x/3 * (1 - p1->vida)), disp->tam_y/30 + 2, disp->tam_x - disp->tam_x/15 - 2, disp->tam_y/12 -2, al_map_rgb(255, 0, 0));
 }
 
-void imprime_selecao(display_info *disp, int p1_x, int p1_y, int p2_x, int p2_y, int back){
-	al_draw_rectangle(disp->tam_x/2 - ((disp->tam_x/8) * 2), disp->tam_y/5 - 4, disp->tam_x/2 -disp->tam_x/8, disp->tam_y/5 * 2 - 4, al_map_rgb(255, 255, 0), 4); 
-	al_draw_rectangle(disp->tam_x/2 + disp->tam_x/8, disp->tam_y/5 - 4, disp->tam_x/2 + ((disp->tam_x/8) * 2), disp->tam_y/5 * 2 - 4, al_map_rgb(255, 255, 255), 4); 
-//	al_draw_rectangle(disp->tam_x/6 * (1 + i), disp->tam_y/15 * (1 + j), disp->tam_x/6 *(2 + 1), disp->tam_y/15 * (2 + j), al_map_rgb(255, 255, 255), 4); 
-//	al_draw_rectangle(disp->tam_x/6 * (1 + i), disp->tam_y/15 * (1 + j), disp->tam_x/6 *(2 + 1), disp->tam_y/15 * (2 + j), al_map_rgb(255, 255, 255), 4); 
+void imprime_selecao(display_info *disp, int p1, int p2, int backi, ALLEGRO_BITMAP *background){
+	imprime_background(background, disp);
+	ALLEGRO_COLOR cor_atual;
+
+	for(int i = 0; i < 4; i++){
+		if(i == p1)
+			cor_atual = al_map_rgb(255, 0, 0);
+		else
+			cor_atual = al_map_rgb(255, 255, 255);
+		int inicial = disp->tam_x/5 + (i * disp->tam_x/6);
+		al_draw_rectangle(inicial, disp->tam_y/5, inicial + disp->tam_x/8, disp->tam_y/5 * 2, cor_atual, 4);
+	}
+	for(int i = 0; i < 4; i++){
+		if(i == p2)
+			cor_atual = al_map_rgb(0, 0, 255);
+		else
+			cor_atual = al_map_rgb(255,255,255);
+		int inicial = disp->tam_x/5 + (i * disp->tam_x/6);
+		al_draw_rectangle(inicial,  3 * disp->tam_y/5, inicial + disp->tam_x/8, disp->tam_y/5 * 4, cor_atual, 4);
+	}
+
 	al_flip_display();
 }
 

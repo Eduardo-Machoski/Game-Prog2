@@ -45,11 +45,6 @@ int main(int argc, char *argv[]){
 	//caso a variavel encerra == true, encerra o programa
 	bool encerra = main_menu(queue, disp, timer, false, NULL, NULL, pressed_keys, background);
 	
-
-	//cria amobos os players
-	player *player_1 = cria_player(disp, 10, false);
-	player *player_2 = cria_player(disp, 90, true);
-
 	//evento atual sendo lidado no loop
 	ALLEGRO_EVENT event;
 
@@ -59,14 +54,14 @@ int main(int argc, char *argv[]){
 	if(!(background = al_load_bitmap("Sprites/Background/background_2.png")))
 		exit(1);
 
+	player *player_1 = NULL, *player_2 = NULL;
+
 	//seleçao de personagem caso "Start Game" seja selecionado
 	//seleciona background tambem
 	if(!encerra)
-		selecao_personagem(disp, player_1, player_2, background, queue);
+		encerra = selecao_personagem(disp, &player_1, &player_2, &background, queue, timer);
 
-	//começa o relogio do programa
 	al_start_timer(timer);
-
 
 	//roda até que o programa seja encerrado
 	while(!encerra){
@@ -80,7 +75,7 @@ int main(int argc, char *argv[]){
 			move_players(player_1, player_2, disp, pressed_keys);
 			imprime_background(background, disp);
 			imprime_vida(disp, player_1, player_2);
-			imprime_players(player_1, player_2, pressed_keys, dev_mode);
+			imprime_players(player_1, player_2, pressed_keys, dev_mode, false);
 			al_flip_display();
 		} else if(code == 10){ //tecla pressionada
 			//atualiza o controle de movimento dos personagens
@@ -93,9 +88,9 @@ int main(int argc, char *argv[]){
 			if(event.keyboard.keycode == 57){
 				al_unregister_event_source(queue, al_get_display_event_source(disp->disp));
 				if(disp->full)
-					full_screen(disp, true);
+					full_screen(disp, true, queue);
 				else
-					full_screen(disp, false);
+					full_screen(disp, false, queue);
 				al_register_event_source(queue, al_get_display_event_source(disp->disp));
 			}
 

@@ -56,7 +56,7 @@ bool main_menu(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *ti
 
 	//menu aberto apos uma partida ter sido iniciada
 	if(reset)
-		selecao_personagem(disp, p1, p2, background, queue);
+		selecao_personagem(disp, &p1, &p2, &background, queue, timer);
 
 	//destroi o menu apos o seu uso
 	destroy_menu(m);
@@ -64,28 +64,101 @@ bool main_menu(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *ti
 	return aux;
 }
 
-void selecao_personagem(display_info *disp, player *p1, player *p2, ALLEGRO_BITMAP *background, ALLEGRO_EVENT_QUEUE *queue){
-	int p1_x = 0;
-	int p1_y = 0;
-	int p2_x = 1;
-	int p2_y = 0;
+//menu de selecao de persnagens e background
+bool selecao_personagem(display_info *disp, player **p1, player **p2, ALLEGRO_BITMAP **background, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER *timer){
 
+	//pausa o timer do jogo
+	al_stop_timer(timer);
+
+	//variaveis que controlam qual personagem os players estao selecionando atualmente
+	int p1_i = 0;
+	int p2_i = 3;
+
+	//variavel que controla o background selecionado
 	int back = 0;
 
-	imprime_selecao(disp, p1_x, p1_y, p2_x, p2_y, back);
+	//verifica se a aplicação nao foi fechada
+	bool retorno = false;
+
+	*background = al_load_bitmap("Sprites/Background/background_1.png");
+
+	//imprime a tela de selecao de personagens
+	imprime_selecao(disp, p1_i, p2_i, back, *background);
 
 	ALLEGRO_EVENT event;
 	al_wait_for_event(queue, &event);
-	while(!(event.type == 10 && event.keyboard.keycode == 67)){
+
+	bool encerra = false;
+
+	//inicia o jogo se "ENTER" for pressionado
+	while(!encerra){
 		al_wait_for_event(queue, &event);
+
+		//atualiza a selecao atual dos players
 		if(event.type == 10){
-			if(event.keyboard.keycode == 1 || event.keyboard.keycode == 4)
-				p1_x = p1_x ^ 1;
-			else if(event.keyboard.keycode == 85 || event.keyboard.keycode == 84)
-				p2_y = p2_y ^ 1;
+			if(event.keyboard.keycode == ALLEGRO_KEY_A){
+				if(p1_i != 0)
+					p1_i--;
+				else
+					p1_i = 3;
+			}
+			else if(event.keyboard.keycode == ALLEGRO_KEY_D){
+				if(p1_i != 3)
+					p1_i++;
+				else
+					p1_i = 0;
+			}
+			else if(event.keyboard.keycode == ALLEGRO_KEY_LEFT){
+				if(p2_i != 0)
+					p2_i--;
+				else
+					p2_i = 3;
+			}
+			else if(event.keyboard.keycode == ALLEGRO_KEY_RIGHT){
+				if(p2_i != 3)
+					p2_i++;
+				else
+					p2_i = 0;
+			}
+			else if(event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
+				full_screen(disp, disp->full, queue);
+			else if(event.keyboard.keycode == ALLEGRO_KEY_ENTER)
+				encerra = true;
+			else if(event.keyboard.keycode == ALLEGRO_KEY_2 && back == 1){
+				al_destroy_bitmap(*background);
+				*background = al_load_bitmap("Sprites/Background/background_2.png");
+				back = 0;
+			} else if(event.keyboard.keycode == ALLEGRO_KEY_1 && back == 0){
+				al_destroy_bitmap(*background);
+				*background = al_load_bitmap("Sprites/Background/background_1.png");
+				back = 1;
+			}
+			imprime_selecao(disp, p1_i, p2_i, back, *background);
 		}
-		imprime_selecao(disp, p1_x, p1_y, p2_x, p2_y, back);
+
+		//verifica se a aplicacao foi fechada
+		if(event.type == 42){
+			retorno = true;
+			encerra = true;
+		}
 	}
+
+	//p1 ja tinha um heroi selecionado
+	if(*p1)
+		destroy_player(*p1);
+
+	//p2 ja tinha um heroi selecionado
+	if(*p2)
+		destroy_player(*p2);
+
+	//cria p1 e p2
+	*p1 = cria_player(disp, 10, false);
+	*p2 = cria_player(disp, 90, true);
+
+	//reinicia o timer do jogo
+	al_start_timer(timer);
+
+	return retorno;
 }
 
 //pausa o jogo, removendo todos os inputs ainda nao processados

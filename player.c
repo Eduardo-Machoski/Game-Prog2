@@ -1,22 +1,30 @@
 #include"player.h"
 
 //cria a estrutura guardando as informações do player e inicializa ela
-player *cria_player(display_info *disp, int ini_x, bool esquerda){
+player *cria_player(display_info *disp, int ini_x, bool esquerda, char *pasta){
 
 	//cria a estrutura e verifica a alocação de memoria
 	player *aux;
         if(!(aux = malloc(sizeof(player))))
 	       exit(1);
 
+	char *bitmap_source = malloc(sizeof(char) * 100);
+	bitmap_source[0] = '\0';
+
+	strcat(bitmap_source, pasta);
+	strcat(bitmap_source, "sprite.png");
+
 	//bitmap para as sprites
 	ALLEGRO_BITMAP *bitmap = NULL;
-	if(!(bitmap = al_load_bitmap("Sprites/Fantasy_Warrior/sprite.png")))
+	if(!(bitmap = al_load_bitmap(bitmap_source)))
 		exit(1);
+
+	free(bitmap_source);
 
 	//abre a file com informações das sprites
 	FILE *file;
-	const char *name = "./Sprites/Fantasy_Warrior/info.txt";
-	if(!(file = fopen(name, "r")))
+	strcat(pasta, "info.txt");
+	if(!(file = fopen(pasta, "r")))
 		exit(1);
 
 	//numero de sprites de animação

@@ -42,7 +42,7 @@ typedef struct {
 
 
 //cria a estrutura guardando as informações do player e inicializa ela
-player *cria_player(display_info *disp, int x_ini, bool esquerda);
+player *cria_player(display_info *disp, int x_ini, bool esquerda, char *pasta);
 
 //verifica se o player pode atacar no momento, se sim atualiza o p->attack para indicar isso
 void verifica_ataque(player *p1, player *p2, bool *keys);

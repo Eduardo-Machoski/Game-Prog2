@@ -151,9 +151,45 @@ bool selecao_personagem(display_info *disp, player **p1, player **p2, ALLEGRO_BI
 	if(*p2)
 		destroy_player(*p2);
 
+	//indica a pasta do personagem selecionado pelo player 1
+	char *pasta_1 = malloc(sizeof(char) * 1000);
+	pasta_1[0] = '\0';
+
+	//indica a pasta do personagem selecionado pelo player 2
+	char *pasta_2 = malloc(sizeof(char) * 1000);
+	pasta_2[0] = '\0';
+
+	//indica a pasta de sprites
+	strcat(pasta_1, "Sprites/");
+	strcat(pasta_2, "Sprites/");
+
+	//indica a pasta correta do player 1
+	if(p1_i == 0)
+		strcat(pasta_1, "Fantasy_Warrior/");
+	else if(p1_i == 1)
+		strcat(pasta_1, "Martial_Hero/");
+	else if(p1_i == 2)
+		strcat(pasta_1, "Martial_Hero_3/");
+	else
+		strcat(pasta_1, "Medieval_Warrior/");
+
+	//indica a pasta correta do player 2
+	if(p2_i == 0)
+		strcat(pasta_2, "Fantasy_Warrior/");
+	else if(p2_i == 1)
+		strcat(pasta_2, "Martial_Hero/");
+	else if(p2_i == 2)
+		strcat(pasta_2, "Martial_Hero_3/");
+	else
+		strcat(pasta_2, "Medieval_Warrior/");
+
 	//cria p1 e p2
-	*p1 = cria_player(disp, 10, false);
-	*p2 = cria_player(disp, 90, true);
+	*p1 = cria_player(disp, 10, false, pasta_1);
+	*p2 = cria_player(disp, 90, true, pasta_2);
+
+	//destroi a string que indicava a pasta dos players
+	free(pasta_1);
+	free(pasta_2);
 
 	//reinicia o timer do jogo
 	al_start_timer(timer);

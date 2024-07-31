@@ -103,9 +103,6 @@ void full_screen(display_info *d, bool borda, ALLEGRO_EVENT_QUEUE *queue){
 //imprime um menu na tela e obtem inputs do usuario para realizar as operaçoes disponiveis em cada menu
 bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER *timer, player *p1, player *p2, bool keys[], ALLEGRO_BITMAP *background){
 
-	//apaga todos os eventos em queue antes do menu ser aberto	
-	al_flush_event_queue(queue);
-
 	//para os ticks do timer enquanto o menu estiver aberto
 	al_stop_timer(timer);
 
@@ -142,11 +139,16 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 				strcat(sprite, m->strings[i]);
 			}
 
+			//obtem a sprite do botao sendo impresso atualmente
 			button = al_load_bitmap(sprite);
 			if(!button){
 				exit(1);
 			}
+
+			//imprime o botao em escala
 			al_draw_scaled_bitmap(button, 0, 0, 600, 200, disp->tam_x/3, disp->tam_y/5 * (i + 1), disp->tam_x/3, disp->tam_y/6, ALLEGRO_MIN_LINEAR);	
+			
+			//destroi o bitmap do botao
 			al_destroy_bitmap(button);
 		}
 
@@ -252,25 +254,76 @@ void imprime_vida(display_info *disp, player *p1, player *p2){
 
 void imprime_selecao(display_info *disp, int p1, int p2, int backi, ALLEGRO_BITMAP *background){
 	imprime_background(background, disp);
-	ALLEGRO_COLOR cor_atual;
 
+	//bitmaps auxiliares
+	ALLEGRO_BITMAP *vermelho = al_load_bitmap("Sprites/Selection/vermelho.png");
+	ALLEGRO_BITMAP *azul = al_load_bitmap("Sprites/Selection/azul.png");
+	ALLEGRO_BITMAP *branco = al_load_bitmap("Sprites/Selection/branco.png");
+
+	int w = al_get_bitmap_width(vermelho);
+      	int h = al_get_bitmap_height(vermelho);	
+	//subbitmaps com a parte do bitmap que sera impressa
+	ALLEGRO_BITMAP *sub_vermelho = al_create_sub_bitmap(vermelho, 3 * w/5, 3 * h/4, w/5, h/4);
+	ALLEGRO_BITMAP *sub_branco = al_create_sub_bitmap(branco, 3 * w/5, 3 * h/4, w/5, h/4);
+	ALLEGRO_BITMAP *sub_azul = al_create_sub_bitmap(azul, 3 * w/5, 3 * h/4, w/5, h/4);
+	
+	ALLEGRO_BITMAP *atual;
+
+	//imprime a selecao do player 1
 	for(int i = 0; i < 4; i++){
 		if(i == p1)
-			cor_atual = al_map_rgb(255, 0, 0);
+			atual = sub_vermelho;
 		else
-			cor_atual = al_map_rgb(255, 255, 255);
-		int inicial = disp->tam_x/5 + (i * disp->tam_x/6);
-		al_draw_rectangle(inicial, disp->tam_y/5, inicial + disp->tam_x/8, disp->tam_y/5 * 2, cor_atual, 4);
-	}
-	for(int i = 0; i < 4; i++){
-		if(i == p2)
-			cor_atual = al_map_rgb(0, 0, 255);
-		else
-			cor_atual = al_map_rgb(255,255,255);
-		int inicial = disp->tam_x/5 + (i * disp->tam_x/6);
-		al_draw_rectangle(inicial,  3 * disp->tam_y/5, inicial + disp->tam_x/8, disp->tam_y/5 * 4, cor_atual, 4);
+			atual = sub_branco;
+		int inicial = disp->tam_x/4 + (i * disp->tam_x/6 - disp->tam_x/12);
+		al_draw_scaled_bitmap(atual, 0, 0, al_get_bitmap_width(atual), al_get_bitmap_height(atual), inicial, disp->tam_y/4, disp->tam_x/6, disp->tam_y/4, 0); 
 	}
 
+	//imprime a selecao do player 2
+	for(int i = 0; i < 4; i++){
+		if(i == p2)
+			atual = sub_azul;
+		else
+			atual = sub_branco;
+		int inicial = disp->tam_x/4 + (i * disp->tam_x/6 - disp->tam_x/12);
+		al_draw_scaled_bitmap(atual, 0, 0, al_get_bitmap_width(atual), al_get_bitmap_height(atual), inicial, 2 * disp->tam_y/4, disp->tam_x/6, disp->tam_y/4, 0); 
+	}
+	//destoi os subbitmaps
+	al_destroy_bitmap(sub_vermelho);
+	al_destroy_bitmap(sub_azul);
+	al_destroy_bitmap(sub_branco);
+
+	//destroi os bitmaps auxiliares
+	al_destroy_bitmap(vermelho);
+	al_destroy_bitmap(branco);
+	al_destroy_bitmap(azul);
+
+	ALLEGRO_BITMAP *fantasy = al_load_bitmap("Sprites/Selection/fantasy_warrior.png");	
+	ALLEGRO_BITMAP *hero_1 = al_load_bitmap("Sprites/Selection/martial_hero.png");	
+	ALLEGRO_BITMAP *hero_2 = al_load_bitmap("Sprites/Selection/martial_hero_3.png");	
+	ALLEGRO_BITMAP *warrior = al_load_bitmap("Sprites/Selection/medieval_warrior.png");	
+	
+	//imprime o fantasy warrior
+	al_draw_scaled_bitmap(fantasy, 0, 0, al_get_bitmap_width(fantasy), al_get_bitmap_height(fantasy), disp->tam_x/4 - disp->tam_x/18, disp->tam_y/4 + disp->tam_y/24, disp->tam_x/8, disp->tam_y/6, 0);
+	al_draw_scaled_bitmap(fantasy, 0, 0, al_get_bitmap_width(fantasy), al_get_bitmap_height(fantasy), disp->tam_x/4 - disp->tam_x/18, 2 * disp->tam_y/4 + disp->tam_y/24, disp->tam_x/8, disp->tam_y/6, 0);
+
+	//imprime o heroi 1
+	al_draw_scaled_bitmap(hero_1, 0, 0, al_get_bitmap_width(fantasy), al_get_bitmap_height(fantasy), disp->tam_x/4 - disp->tam_x/18 + disp->tam_x/6, disp->tam_y/4 + disp->tam_y/24, disp->tam_x/8, disp->tam_y/6, 0);
+	al_draw_scaled_bitmap(hero_1, 0, 0, al_get_bitmap_width(fantasy), al_get_bitmap_height(fantasy), disp->tam_x/4 - disp->tam_x/18 + disp->tam_x/6, 2 * disp->tam_y/4 + disp->tam_y/24, disp->tam_x/8, disp->tam_y/6, 0);
+	
+	//imprime o heroi 2
+	al_draw_scaled_bitmap(hero_2, 0, 0, al_get_bitmap_width(fantasy), al_get_bitmap_height(fantasy), disp->tam_x/4 - disp->tam_x/18 + disp->tam_x/3, disp->tam_y/4 + disp->tam_y/24, disp->tam_x/8, disp->tam_y/6, 0);
+	al_draw_scaled_bitmap(hero_2, 0, 0, al_get_bitmap_width(fantasy), al_get_bitmap_height(fantasy), disp->tam_x/4 - disp->tam_x/18 + disp->tam_x/3, 2 * disp->tam_y/4 + disp->tam_y/24, disp->tam_x/8, disp->tam_y/6, 0);
+	
+	//imprime o warrior
+	al_draw_scaled_bitmap(warrior, 0, 0, al_get_bitmap_width(fantasy), al_get_bitmap_height(fantasy), disp->tam_x/4 - disp->tam_x/18 + disp->tam_x/2, disp->tam_y/4 + disp->tam_y/24, disp->tam_x/8, disp->tam_y/6, 0);
+	al_draw_scaled_bitmap(warrior, 0, 0, al_get_bitmap_width(fantasy), al_get_bitmap_height(fantasy), disp->tam_x/4 - disp->tam_x/18 + disp->tam_x/2, 2 * disp->tam_y/4 + disp->tam_y/24, disp->tam_x/8, disp->tam_y/6, 0);
+
+	al_destroy_bitmap(fantasy);
+	al_destroy_bitmap(hero_1);
+	al_destroy_bitmap(hero_2);
+	al_destroy_bitmap(warrior);
+	//atualiza a tela
 	al_flip_display();
 }
 
@@ -281,4 +334,4 @@ void destroy_display_info(display_info *d){
 	
 	//destroi a estrutura display_info
 	free(d);
-}
+event.type}

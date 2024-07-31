@@ -40,8 +40,8 @@ bool main_menu(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *ti
 		return false;
 
 	//cria as strings do menu
-	char fala1[] = "Start Game";
-	char fala2[] = "Exit Game";
+	char fala1[] = "new_game.png";
+	char fala2[] = "quit.png";
 
 	//inicializa as strings do menu
 	m->strings[0] = fala1;
@@ -170,9 +170,9 @@ bool pause_gui(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *ti
 		return false;
 
 	//cria as strings do menu
-	char fala1[] = "Return Game";
-	char fala2[] = "Main Menu";
-	char fala3[] = "Exit Game";
+	char fala1[] = "resume.png";
+	char fala2[] = "menu.png";
+	char fala3[] = "quit.png";
 
 	//inicializa as strings do menu
 	m->strings[0] = fala1;

@@ -111,9 +111,6 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 
 
 	ALLEGRO_EVENT event;
-	ALLEGRO_FONT *font = al_create_builtin_font();
-	ALLEGRO_COLOR color = al_map_rgb(0, 255, 255);
-	ALLEGRO_COLOR color2 = al_map_rgb(0,0, 255);
 
 	//controle de qual opcao do menu o usuario esta atualmente selecionando
 	int atual = 0;
@@ -123,18 +120,34 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 
 	//controle de continuacao do menu
 	bool continua = true;
-	while(continua){
+	
+	//indica a sprite a ser aberta
+	char *sprite = malloc(sizeof(char) * 1000);
+	ALLEGRO_BITMAP *button = NULL;
 
+	while(continua){
 		if(background != NULL){
 			imprime_background(background, disp);
 			imprime_players(p1, p2, keys, false, true);
 		}
 		//imprime as opçoes do menu
 		for(int i = 0; i < m->opcoes; i++){
-			if(i == atual) //opçao atualmente selecionada
-				al_draw_text(font, color2, disp->tam_x * 0.25, disp->tam_y * 0.25 + (i * disp->tam_y * 0.10), ALLEGRO_ALIGN_LEFT, m->strings[i]); 
-			else //outras opçoes
-				al_draw_text(font, color, disp->tam_x * 0.25, disp->tam_y * 0.25 + (i * disp->tam_y * 0.10), ALLEGRO_ALIGN_LEFT, m->strings[i]); 
+			sprite[0] = '\0';
+			strcat(sprite, "Sprites/Menu/");
+			if(i == atual){ //opçao atualmente selecionada
+				strcat(sprite, "Collored_Buttons/");
+				strcat(sprite, m->strings[i]);
+			} else{
+				strcat(sprite, "Buttons/");
+				strcat(sprite, m->strings[i]);
+			}
+
+			button = al_load_bitmap(sprite);
+			if(!button){
+				exit(1);
+			}
+			al_draw_scaled_bitmap(button, 0, 0, 600, 200, disp->tam_x/3, disp->tam_y/5 * (i + 1), disp->tam_x/3, disp->tam_y/6, ALLEGRO_MIN_LINEAR);	
+			al_destroy_bitmap(button);
 		}
 
 		//atualiza a tela
@@ -169,8 +182,8 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 		keys[event.keyboard.keycode] = keys[event.keyboard.keycode] ^ 1;
 	}
 
-	//destoi a fonte
-	al_destroy_font(font);
+	//destoi a string auxiliar sprite
+	free(sprite);
 
 	//retoma os ticks do timer
 	al_start_timer(timer);

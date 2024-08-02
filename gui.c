@@ -145,7 +145,7 @@ bool selecao_personagem(display_info *disp, player **p1, player **p2, ALLEGRO_BI
 
 	//players com personagens ja selecionados	
 	*p1 = destroy_player(*p1);
-	*p2= destroy_player(*p2);	
+	*p2 = destroy_player(*p2);	
 
 	//indica a pasta do personagem selecionado pelo player 1
 	char *pasta_1 = malloc(sizeof(char) * 1000);

@@ -46,9 +46,9 @@ player *cria_player(display_info *disp, int ini_x, bool esquerda, char *pasta){
 
 	//indices onde cada sequencia de animacao comeca
 	int *indice_sprites;
-	if(!(indice_sprites = malloc(sizeof(int) * 7)))
+	if(!(indice_sprites = malloc(sizeof(int) * 9)))
 		exit(1);
-	for(int i = 0; i < 7; i++)
+	for(int i = 0; i < 9; i++)
 		fscanf(file, "%d", &indice_sprites[i]);
 
 	int frames;

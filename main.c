@@ -44,7 +44,7 @@ int main(int argc, char *argv[]){
 	//abre o menu principal no inicio do jogo
 	//caso a variavel encerra == true, encerra o programa
 	bool encerra = main_menu(queue, disp, timer, false, NULL, NULL, pressed_keys, background);
-	
+
 	//evento atual sendo lidado no loop
 	ALLEGRO_EVENT event;
 

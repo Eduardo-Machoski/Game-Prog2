@@ -307,24 +307,48 @@ void colisao_players(player *p1, player *p2, bool *keys){
 //verifica se o atancdo acerta o ataque 1 (alto) na vitima
 void attack_1(player *atacando, player *vitima){
 
+	if((atacando->sprite_atual < atacando->i_sprites[6] - 2) || vitima->recuo)
+		return;
+
 	//atacando para esqueda e vitima dentro do alcance e nao agachada
-	if(atacando->olha_esquerda && !vitima->crouch && vitima->x < atacando->x && vitima->x + vitima->side/2 > atacando->x - atacando->side/2 - atacando->attack_1[0]){
-		//vitima->vida -= atacando->dano_1;
+	if(atacando->olha_esquerda && !vitima->crouch && (vitima->x < atacando->x) && (vitima->x + vitima->side/2 > atacando->x - atacando->side/2 - atacando->attack_1[0])){
+		vitima->vida -= 0.1;
 		vitima->recuo = true;
-	} else if(!atacando->olha_esquerda && !vitima->crouch && vitima->x > atacando->x && vitima->x - vitima->side/2 > atacando->x + atacando->side/2 + atacando->attack_1[0]){ //atacando para direita, vitima dentro do alcance e nao agachada
-		//vitima->vida -= atacando->dano_1;
+		vitima->attack = 0;
+		vitima->attack_done = true;
+	} else if(!atacando->olha_esquerda && !vitima->crouch && (vitima->x > atacando->x) && (vitima->x - vitima->side/2 < atacando->x + atacando->side/2 + atacando->attack_1[0])){ //atacando para direita, vitima dentro do alcance e nao agachada
+		vitima->vida -= 0.1;
 		vitima->recuo = true;
+		vitima->attack = 0;
+		vitima->attack_done = true;
 	} 
 }
 
 //verifica se o atacando acerta o ataque 2 (baixo) na vitima
 void attack_2(player *atacando, player *vitima){
+	if((atacando->sprite_atual < atacando->i_sprites[7] - 2) || vitima->recuo)
+		return;
+
+	//atacando para esqueda e vitima dentro do alcance e nao nao esta pulando
+	if(atacando->olha_esquerda && (!vitima->jump || abs(vitima->jump_height) < 0.2) && (vitima->x < atacando->x) && (vitima->x + vitima->side/2 > atacando->x - atacando->side/2 - atacando->attack_2[0])){
+		vitima->vida -= 0.05;
+		vitima->recuo = true;
+		vitima->attack = 0;
+		vitima->attack_done = true;
+	} else if(!atacando->olha_esquerda && (!vitima->jump && abs(vitima->jump_height) < 0.2) && (vitima->x > atacando->x) && (vitima->x - vitima->side/2 < atacando->x + atacando->side/2 + atacando->attack_2[0])){ //atacando para direita, vitima dentro do alcance e nao esta pulando
+		vitima->vida -= 0.05;
+		vitima->recuo = true;
+		vitima->attack = 0;
+		vitima->attack_done = true;
+	} 
 }
 
 //verifica o estado atual do player e retorna um subbitmap com a sprite atual que deve ser desenhada
 void seleciona_sprite(player *p, int player, bool keys[]){
 	int num;
-	if(p->jump){
+	if(p->recuo){ //player atinjido por ataque
+		num = 7;
+	} else if(p->jump){//player pulando
 		if(p->jump_height >= 0){ //subida do pulo
 			num = 2;
 		} else {//queda do pulo
@@ -360,6 +384,10 @@ void seleciona_sprite(player *p, int player, bool keys[]){
 		p->attack_done = true;
 		p->attack = 0;
 	}
+
+	//verifica se a animacao de hit ja acabou
+	if(p->recuo && p->sprite_atual + 1 == p->i_sprites[8] && p->tempo_ciclo >= p->frames - 1)
+		p->recuo = false;
 	
 	//verifica se é necessario mudar a imagem por conta do tempo
 	if(p->tempo_ciclo >= p->frames){

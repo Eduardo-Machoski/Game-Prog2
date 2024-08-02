@@ -265,7 +265,7 @@ void imprime_vida(display_info *disp, player *p1, player *p2){
 
 	//vida do player2
 	al_draw_filled_rectangle(2 * disp->tam_x/3, disp->tam_y/30, disp->tam_x - disp->tam_x/15, disp->tam_y/12, al_map_rgb(255, 255, 255));
-	al_draw_filled_rectangle(2 * disp->tam_x/3 + 2 + (disp->tam_x/3 * (1 - p1->vida)), disp->tam_y/30 + 2, disp->tam_x - disp->tam_x/15 - 2, disp->tam_y/12 -2, al_map_rgb(255, 0, 0));
+	al_draw_filled_rectangle(2 * disp->tam_x/3 + 2 + (disp->tam_x/3 * (1 - p2->vida)), disp->tam_y/30 + 2, disp->tam_x - disp->tam_x/15 - 2, disp->tam_y/12 -2, al_map_rgb(255, 0, 0));
 }
 
 void imprime_selecao(display_info *disp, int p1, int p2, int backi, ALLEGRO_BITMAP *background){

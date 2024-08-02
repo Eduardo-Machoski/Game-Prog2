@@ -11,6 +11,8 @@ typedef struct {
 	int *i_sprites; //indica o indice inicial de cada grupo de sprits em uma animacao
 	int *attack_1; //tamanho do hitbox do ataque_1 (alto)
 	int *attack_2; //tamanho do hitbox do ataque_2 (baixo)
+	ALLEGRO_BITMAP *bitmap; //bitmap com todas as sprites do player
+	ALLEGRO_BITMAP *sprite; //bitmap com a ultima sprite impressa do player
 	float vida; //vida atual
 	float jump_height; //quantidade que o player deve pular se jump == true
 	int x; //pos x do player
@@ -31,8 +33,6 @@ typedef struct {
 	bool recuo; //indica se o player esta em estado de recuo apos receber um ataque
 	bool attack_done; //indica se um ataque ja foi concluido
 	char attack; //indica se um ataque esta sendo realizado e qual (0 se nao)
-	ALLEGRO_BITMAP *bitmap; //bitmap com todas as sprites do player
-	ALLEGRO_BITMAP *sprite; //bitmap com a ultima sprite impressa do player
 } player;
 
 #include"display.h"

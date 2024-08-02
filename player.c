@@ -62,12 +62,16 @@ player *cria_player(display_info *disp, int ini_x, bool esquerda, char *pasta){
 	if(!(attack_2 = malloc(sizeof(int) * 2)))
 		exit(1);
 
+	//le o hitbox em relacao a sprite do heroi
 	fscanf(file, "%d %d", &attack_1[0], &attack_1[1]);
 	fscanf(file, "%d %d", &attack_2[0], &attack_2[1]);
 
+	//ajusta as hitboxes para o tamanho da tela atual
 	attack_1[0] = (disp->tam_x/8) * (attack_1[0]/(float)width);
 	attack_1[1] = (disp->tam_x/8) * (attack_1[1]/(float)width);
 
+	attack_2[0] = (disp->tam_x/8) * (attack_2[0]/(float)width);
+	attack_2[1] = (disp->tam_x/8) * (attack_2[1]/(float)width);
 
 	//inicializa o player
 	aux->side = disp->tam_x / 16;
@@ -106,31 +110,38 @@ player *cria_player(display_info *disp, int ini_x, bool esquerda, char *pasta){
 
 //verifica se o player pode atacar no momento, se sim atualiza o p->attack para indicar isso
 void verifica_ataque(player *p1, player *p2, bool *keys){
-	if(!p1->jump && !p1->crouch && p1->attack == 0){ //verifica se o p1 pode atacar
-		if(keys[26]){//ataque baixo
+	if(!p1->jump && !p1->crouch  && !p1->recuo && p1->attack == 0){ //verifica se o p1 pode atacar
+		if(keys[ALLEGRO_KEY_Z]){//ataque alto
 			p1->attack = 1;
 			p1->attack_done = false;
 		}
-		if(keys[24]){//ataque alto
+		if(keys[ALLEGRO_KEY_X]){//ataque baixo
 			p1->attack = 2;
 			p1->attack_done = false;
 		}
 	}
 
-	if(!p2->jump && !p2->crouch && p2->attack == 0){//verifica se o p2 pode atacar
-		if(keys[73]){//ataque baixo
+	if(!p2->jump && !p2->crouch && !p2->recuo && p2->attack == 0){//verifica se o p2 pode atacar
+		if(keys[ALLEGRO_KEY_PAD_1]){//ataque alto 
 			p2->attack = 1;
 			p2->attack_done = false;
 		}
-		if(keys[68]){//ataque alto
+		if(keys[ALLEGRO_KEY_PAD_2]){//ataque baixo
 			p2->attack = 2;
 			p2->attack_done = false;
 		}
 	}
 
 	//verifica hits dos ataques
-	attack_1(p1, p2);
-	attack_1(p2, p1);
+	if(p1->attack == 1)
+		attack_1(p1, p2);
+	else if(p1->attack == 2)
+		attack_2(p1, p2);
+
+	if(p2->attack == 1)
+		attack_1(p2, p1);
+	else if (p2->attack == 2)
+		attack_2(p2, p1);
 }
 
 //atualiza a posicao x e y dos players a partir de seus controles
@@ -138,18 +149,39 @@ void move_players(player *p1, player *p2, display_info  *disp, bool *keys){
 
 	int half_side_p1 = p1->side/2;
 	int half_side_p2 = p2->side/2;
+
+	//divisor da velocidade (1 velocidade normal, 2 velociadade diminuida)
+	int crouch_1 = 1;
+	int crouch_2 = 1;
+
+
+	//verifica se o player1 esta agachado e atualiza a velociadade
+	if(p1->attack == 0 && !p1->jump  && !p1->recuo && keys[ALLEGRO_KEY_S]){
+		p1->crouch = true;
+		crouch_1 = 2;
+	} else{
+		p1->crouch = false;
+	}
+
+	//verifica se o player2 esta agachado e atualiza a velociadade
+	if(p2->attack == 0 && !p2->jump && !p1->recuo && keys[ALLEGRO_KEY_DOWN]){
+		p2->crouch = true;
+		crouch_2 = 2;
+	} else{
+		p2->crouch = false;
+	}
 	
-	if(p1->attack == 0){
+	if(p1->attack == 0 && !p1->recuo){
 		//atualiza a posicao x do player1
-		p1->x += VELOCIDADE_X * (keys[4] - keys[1]);
+		p1->x += (VELOCIDADE_X/crouch_1) * (keys[4] - keys[1]);
 		//verifica colisao do player1 com a borda da tela nas laterais
 		if(p1->x < half_side_p1 || p1->x > disp->tam_x - half_side_p1)
 			p1->x = half_side_p1 * keys[1] + (disp->tam_x - half_side_p1) * keys[4];
 	}
 
-	if(p2->attack == 0){	
+	if(p2->attack == 0 && !p1->recuo){	
 		//atualiza a posicao x do player2
-		p2->x += VELOCIDADE_X * (keys[83] - keys[82]);
+		p2->x += (VELOCIDADE_X/crouch_2) * (keys[83] - keys[82]);
 		//verifica colisao do player2 com a borda da tela nas lateraiss
 		if(p2->x < half_side_p2 || p2->x > disp->tam_x - half_side_p2)
 			p2->x = half_side_p2 * keys[82] + (disp->tam_x - half_side_p2) * keys[83];
@@ -170,7 +202,7 @@ void move_players(player *p1, player *p2, display_info  *disp, bool *keys){
 
 		//atualiza o valor do salto para efeito da gravidade
 		p1->jump_height -= 0.01;
-	} else if(keys[23] && p1->attack  == 0 && !p1->recuo && p1->y == disp->tam_y - (p1->height/2 + disp->chao)) //p1 em posicao valida para saltar
+	} else if(keys[23] && p1->attack  == 0 && !p1->recuo && p1->y == disp->tam_y - (p1->height/2 + disp->chao))//p1 em posicao valida para saltar
 		p1->jump = true;
 
 	//verifica se o p2 esta saltando
@@ -186,7 +218,7 @@ void move_players(player *p1, player *p2, display_info  *disp, bool *keys){
 
 		//atualiza o valor do salto para efeito da gravidade
 		p2->jump_height -= 0.01;
-	} else if(keys[84] && p2->attack == 0  && !p2->recuo && p2->y == disp->tam_y - (p2->height/2 + disp->chao)) //p2 em posicao valida para saltar
+	} else if(keys[84] && p2->attack == 0  && !p2->recuo && p2->y == disp->tam_y - (p2->height/2 + disp->chao))//p2 em posicao valida para saltar
 		p2->jump = true;
 
 	//verifica e arruma colisao entre players
@@ -272,46 +304,59 @@ void colisao_players(player *p1, player *p2, bool *keys){
 	}
 }
 
-//caso atacando esteja realizando o attack_1 verifica se houve hit na vitima
+//verifica se o atancdo acerta o ataque 1 (alto) na vitima
 void attack_1(player *atacando, player *vitima){
-	//player nao esta atacando
-	if(atacando->attack != 1)
-		return;
 
-	if((atacando->sprite_atual >= atacando->i_sprites[4] - 2) && atacando->olha_esquerda)
-		al_draw_rectangle(atacando->x - atacando->side/2 - atacando->attack_1[0], atacando->y - atacando->height/2, atacando->x - atacando->side/2, atacando->y + atacando->attack_1[1], al_map_rgb(255,0,0), 1);
+	//atacando para esqueda e vitima dentro do alcance e nao agachada
+	if(atacando->olha_esquerda && !vitima->crouch && vitima->x < atacando->x && vitima->x + vitima->side/2 > atacando->x - atacando->side/2 - atacando->attack_1[0]){
+		//vitima->vida -= atacando->dano_1;
+		vitima->recuo = true;
+	} else if(!atacando->olha_esquerda && !vitima->crouch && vitima->x > atacando->x && vitima->x - vitima->side/2 > atacando->x + atacando->side/2 + atacando->attack_1[0]){ //atacando para direita, vitima dentro do alcance e nao agachada
+		//vitima->vida -= atacando->dano_1;
+		vitima->recuo = true;
+	} 
+}
 
-	if((atacando->sprite_atual >= atacando->i_sprites[4] - 2) && !atacando->olha_esquerda)
-		al_draw_rectangle(atacando->x + atacando->side/2 + atacando->attack_1[0], atacando->y - atacando->height/2, atacando->x + atacando->side/2, atacando->y + atacando->attack_1[1], al_map_rgb(255,0,0), 1);
+//verifica se o atacando acerta o ataque 2 (baixo) na vitima
+void attack_2(player *atacando, player *vitima){
 }
 
 //verifica o estado atual do player e retorna um subbitmap com a sprite atual que deve ser desenhada
-void seleciona_sprite(player *p){
+void seleciona_sprite(player *p, int player, bool keys[]){
 	int num;
 	if(p->jump){
 		if(p->jump_height >= 0){ //subida do pulo
-			num = 1;
-		} else {//queda do pulo
 			num = 2;
+		} else {//queda do pulo
+			num = 3;
 		}
-	} else if (p->attack == 0){ //idle
-		num = 0;
-	} else if (p->attack == 1){ //ataque baixo
-		num = 3;
-	} else if (p->attack == 2){ //ataque alto
-		num = 4;
+	} else if (p->attack == 0){ //idle, crouch ou andando
+		if(p->crouch)//crouch
+			num = 4;
+		else{
+			if(player == 1 && (keys[ALLEGRO_KEY_A] || keys[ALLEGRO_KEY_D]))//p1 andando
+				num = 1;
+			else if (player == 2 && (keys[ALLEGRO_KEY_LEFT] || keys[ALLEGRO_KEY_RIGHT]))//p2 andando
+				num = 1;
+			else //idle
+				num = 0;
+		}
+	} else if (p->attack == 1){ //ataque alto
+		num = 5;
+	} else if (p->attack == 2){ //ataque baixo 
+		num = 6;
 	}
 	bool troca = false;
 
 	//verifica se o estado (jump, idle...) mudou
-	if(!(p->sprite_atual >= p->i_sprites[num] && (num == 6 || p->sprite_atual < p->i_sprites[num + 1]))){
+	if(!(p->sprite_atual >= p->i_sprites[num] && (num == 8 || p->sprite_atual < p->i_sprites[num + 1]))){
 		p->sprite_atual = p->i_sprites[num];
 		p->tempo_ciclo = 0;
 		troca = true;
 	}
 
 	//verifica se o ataque acabou
-	if(p->attack != 0 && p->sprite_atual +1 == p->i_sprites[num + 1] && p->tempo_ciclo >= p->frames - 1){
+	if(p->attack != 0 && p->sprite_atual + 1 == p->i_sprites[num + 1] && p->tempo_ciclo >= p->frames - 1){
 		p->attack_done = true;
 		p->attack = 0;
 	}
@@ -319,7 +364,7 @@ void seleciona_sprite(player *p){
 	//verifica se é necessario mudar a imagem por conta do tempo
 	if(p->tempo_ciclo >= p->frames){
 		int num_sprites;
-		if(num < 6)
+		if(num < 8)
 			num_sprites = p->i_sprites[num + 1] - p->i_sprites[num];
 		else
 			num_sprites = p->num_sprites - p->i_sprites[num];

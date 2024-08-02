@@ -214,13 +214,29 @@ void imprime_players(player *p1, player *p2, bool *keys, bool hitbox, bool pause
 			else
 				al_draw_rectangle(p2->x + p2->side/2 + p2->attack_1[0], p2->y - p2->attack_1[1]/2, p2->x + p2->side/2, p2->y + p2->attack_1[1]/2, al_map_rgb(255,0,0), 1);
 		}
+		
+		//hitbox attack_2 p1
+		if((p1->attack == 2)){
+			if(p1->olha_esquerda)
+				al_draw_rectangle(p1->x - p1->side/2 - p1->attack_2[0], p1->y - p2->attack_2[1]/2, p1->x - p1->side/2, p1->y + p1->attack_2[1]/2, al_map_rgb(255,0,0), 1);
+			else
+				al_draw_rectangle(p1->x + p1->side/2 + p1->attack_2[0], p1->y - p1->attack_2[1]/2, p1->x + p1->side/2, p1->y + p1->attack_2[1]/2, al_map_rgb(255,0,0), 1);
+		}
+
+		//hitbox attack_2 p2
+		if((p2->attack == 2)){
+			if(p2->olha_esquerda)
+				al_draw_rectangle(p2->x - p2->side/2 - p2->attack_2[0], p2->y - p2->attack_2[1]/2, p2->x - p2->side/2, p2->y + p2->attack_2[1]/2, al_map_rgb(255,0,0), 1);
+			else
+				al_draw_rectangle(p2->x + p2->side/2 + p2->attack_2[0], p2->y - p2->attack_2[1]/2, p2->x + p2->side/2, p2->y + p2->attack_2[1]/2, al_map_rgb(255,0,0), 1);
+		}
 	}
 
 	//verifica se o jogo nao esta pausado para mudar a sprite
 	if(!pause){
 		//seleciona a sprite correta a ser impressa nesse ciclo
-		seleciona_sprite(p1);
-		seleciona_sprite(p2);
+		seleciona_sprite(p1, 1, keys);
+		seleciona_sprite(p2, 2, keys);
 	}
 	//verifica qual a orientacao do player (esquerda ou direita)
 	orientacao_players(p1, p2, keys);

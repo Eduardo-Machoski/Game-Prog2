@@ -9,8 +9,8 @@
 
 typedef struct {
 	int *i_sprites; //indica o indice inicial de cada grupo de sprits em uma animacao
-	int *attack_1; //tamanho do hitbox do ataque_1 (baixo)
-	int *attack_2; //tamanho do hitbox do ataque_2 (alto)
+	int *attack_1; //tamanho do hitbox do ataque_1 (alto)
+	int *attack_2; //tamanho do hitbox do ataque_2 (baixo)
 	float vida; //vida atual
 	float jump_height; //quantidade que o player deve pular se jump == true
 	int x; //pos x do player
@@ -38,7 +38,7 @@ typedef struct {
 #include"display.h"
 
 #define VELOCIDADE_X 10 
-#define VELOCIDADE_MAX_Y 0.09
+#define VELOCIDADE_MAX_Y 0.10
 
 
 //cria a estrutura guardando as informações do player e inicializa ela
@@ -53,11 +53,14 @@ void move_players(player *p1, player *p2, display_info *disp, bool *keys);
 //verifica e corrige colisao entre players
 void colisao_players(player *p1, player *p2, bool *keys);
 
-//caso atacando esteja realizando o attack_1 (baixo) verifica se houve hit na vitima
+//verifica se o atacando aceta o ataque 1 (alto) na vitima
 void attack_1(player *atacando, player *vitima);
 
+//verifica se o atacando acerto o ataque 2 (baixo) na vitima
+void attack_2(player *atacando, player *vitima);
+
 //verifica o estado atual do player e atualiza p->sprite com a sprite atual que deve ser desenhada
-void seleciona_sprite(player *p);
+void seleciona_sprite(player *p, int player, bool keys[]);
 
 //verifica qual a orientacao dos players (esquerda ou direita)
 void orientacao_players(player *p1, player *p2, bool *keys);

@@ -33,7 +33,7 @@ menus *cria_menu(int tam){
 }
 
 //menu principal do jogo
-bool main_menu(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *timer, bool reset, player *p1, player *p2, bool keys[], ALLEGRO_BITMAP *background){
+bool main_menu(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *timer, bool reset, player **p1, player **p2, bool keys[], ALLEGRO_BITMAP *background){
 	//cria o menu que sera usado no display
 	menus *m;
 	if(!(m = cria_menu(2)))
@@ -56,7 +56,7 @@ bool main_menu(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *ti
 
 	//menu aberto apos uma partida ter sido iniciada
 	if(reset)
-		selecao_personagem(disp, &p1, &p2, &background, queue, timer);
+		selecao_personagem(disp, p1, p2, &background, queue, timer);
 
 	//destroi o menu apos o seu uso
 	destroy_menu(m);
@@ -89,7 +89,7 @@ bool selecao_personagem(display_info *disp, player **p1, player **p2, ALLEGRO_BI
 	al_wait_for_event(queue, &event);
 
 	bool encerra = false;
-
+	
 	//inicia o jogo se "ENTER" for pressionado
 	while(!encerra){
 		al_wait_for_event(queue, &event);
@@ -143,13 +143,9 @@ bool selecao_personagem(display_info *disp, player **p1, player **p2, ALLEGRO_BI
 		}
 	}
 
-	//p1 ja tinha um heroi selecionado
-	if(*p1)
-		destroy_player(*p1);
-
-	//p2 ja tinha um heroi selecionado
-	if(*p2)
-		destroy_player(*p2);
+	//players com personagens ja selecionados	
+	*p1 = destroy_player(*p1);
+	*p2= destroy_player(*p2);	
 
 	//indica a pasta do personagem selecionado pelo player 1
 	char *pasta_1 = malloc(sizeof(char) * 1000);
@@ -198,7 +194,7 @@ bool selecao_personagem(display_info *disp, player **p1, player **p2, ALLEGRO_BI
 }
 
 //pausa o jogo, removendo todos os inputs ainda nao processados
-bool pause_gui(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *timer, player *p1, player *p2, bool keys[], ALLEGRO_BITMAP *background){
+bool pause_gui(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *timer, player **p1, player **p2, bool keys[], ALLEGRO_BITMAP *background){
 
 	//cria o menu que sera usado no display
 	menus *m;

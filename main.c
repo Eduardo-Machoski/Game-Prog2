@@ -96,7 +96,7 @@ int main(int argc, char *argv[]){
 
 			//pressiona 'esc' para pausar o jogo e abrir o menu de pausa
 			if(event.keyboard.keycode == 59)
-				encerra = pause_gui(queue, disp, timer, player_1, player_2, pressed_keys, background);
+				encerra = pause_gui(queue, disp, timer, &player_1, &player_2, pressed_keys, background);
 
 		} else if(code == 12){ // tecla liberada
 			//atualiza o controle de movimento dos personagens

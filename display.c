@@ -101,7 +101,7 @@ void full_screen(display_info *d, bool borda, ALLEGRO_EVENT_QUEUE *queue){
 }
 
 //imprime um menu na tela e obtem inputs do usuario para realizar as operaçoes disponiveis em cada menu
-bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER *timer, player *p1, player *p2, bool keys[], ALLEGRO_BITMAP *background){
+bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER *timer, player **p1, player **p2, bool keys[], ALLEGRO_BITMAP *background){
 
 	//para os ticks do timer enquanto o menu estiver aberto
 	al_stop_timer(timer);
@@ -125,7 +125,7 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 	while(continua){
 		if(background != NULL){
 			imprime_background(background, disp);
-			imprime_players(p1, p2, keys, false, true);
+			imprime_players(*p1, *p2, keys, false, true);
 		}
 		//imprime as opçoes do menu
 		for(int i = 0; i < m->opcoes; i++){
@@ -334,4 +334,4 @@ void destroy_display_info(display_info *d){
 	
 	//destroi a estrutura display_info
 	free(d);
-event.type}
+}

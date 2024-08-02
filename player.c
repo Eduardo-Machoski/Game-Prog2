@@ -359,11 +359,14 @@ void orientacao_players(player *p1, player *p2, bool *keys){
 }
 
 //destroi um player e seus componentes
-void destroy_player(player *elem){
-	al_destroy_bitmap(elem->bitmap);
+player *destroy_player(player *elem){
+	if(!elem)
+		return elem;
 	al_destroy_bitmap(elem->sprite);
+	al_destroy_bitmap(elem->bitmap);
 	free(elem->attack_1);
 	free(elem->attack_2);
 	free(elem->i_sprites);
 	free(elem);
+	return NULL;
 }

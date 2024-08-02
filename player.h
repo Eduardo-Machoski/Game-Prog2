@@ -63,6 +63,6 @@ void seleciona_sprite(player *p);
 void orientacao_players(player *p1, player *p2, bool *keys);
 
 //destroi um player e seus componentes
-void destroy_player(player *elem);
+player *destroy_player(player *elem);
 
 #endif

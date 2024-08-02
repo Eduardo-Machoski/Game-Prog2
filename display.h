@@ -24,7 +24,7 @@ display_info *cria_display();
 void full_screen(display_info *d, bool borda, ALLEGRO_EVENT_QUEUE *queue);
 
 //imprime um menu na tela e obtem inputs do usuario para realizar as operaçoes disponiveis em cada menu
-bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER *timer, player *p1, player *p2, bool keys[], ALLEGRO_BITMAP *background);
+bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER *timer, player **p1, player **p2, bool keys[], ALLEGRO_BITMAP *background);
 
 //imprime ambos os players na tela
 void imprime_players(player *p1, player *p2, bool *keys, bool hitbox, bool pause);

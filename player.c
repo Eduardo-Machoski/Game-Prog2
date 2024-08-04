@@ -114,22 +114,22 @@ player *cria_player(display_info *disp, int ini_x, bool esquerda, char *pasta){
 //verifica se o player pode atacar no momento, se sim atualiza o p->attack para indicar isso
 void verifica_ataque(player *p1, player *p2, bool *keys, display_info *disp){
 	if(!p1->jump && !p1->crouch  && !p1->recuo && p1->attack == 0){ //verifica se o p1 pode atacar
-		if(keys[ALLEGRO_KEY_Z]){//ataque alto
+		if(keys[ALLEGRO_KEY_Z] && p1->stamina >= 30){//verifica stamina para ataque alto
 			p1->attack = 1;
 			p1->attack_done = false;
 		}
-		if(keys[ALLEGRO_KEY_X]){//ataque baixo
+		if(keys[ALLEGRO_KEY_X] && p1->stamina >= 10){//verifica stamina para ataque baixo
 			p1->attack = 2;
 			p1->attack_done = false;
 		}
 	}
 
 	if(!p2->jump && !p2->crouch && !p2->recuo && p2->attack == 0){//verifica se o p2 pode atacar
-		if(keys[ALLEGRO_KEY_PAD_1]){//ataque alto 
+		if(keys[ALLEGRO_KEY_PAD_1] && p2->stamina >= 30){//verifica stamina para ataque alto 
 			p2->attack = 1;
 			p2->attack_done = false;
 		}
-		if(keys[ALLEGRO_KEY_PAD_2]){//ataque baixo
+		if(keys[ALLEGRO_KEY_PAD_2] && p2->stamina >= 10){//verifica stamina para ataque baixo
 			p2->attack = 2;
 			p2->attack_done = false;
 		}
@@ -214,12 +214,14 @@ void move_players(player *p1, player *p2, display_info  *disp, bool *keys){
 			p1->jump_height = VELOCIDADE_MAX_Y;
 			p1->y = disp->tam_y - (p1->height/2 + disp->chao);
 			p1->jump = false;
+			p1->stamina -= 10;
 		}
 
 		//atualiza o valor do salto para efeito da gravidade
 		p1->jump_height -= 0.01;
-	} else if(keys[23] && p1->attack  == 0 && !p1->recuo && p1->y == disp->tam_y - (p1->height/2 + disp->chao))//p1 em posicao valida para saltar
+	} else if(keys[23] && p1->attack  == 0 && !p1->recuo && p1->y == disp->tam_y - (p1->height/2 + disp->chao) && p1->stamina >= 10)//p1 em posicao valida para saltar
 		p1->jump = true;
+	
 
 	//verifica se o p2 esta saltando
 	if(p2->jump){
@@ -230,11 +232,12 @@ void move_players(player *p1, player *p2, display_info  *disp, bool *keys){
 			p2->jump_height = VELOCIDADE_MAX_Y;
 			p2->y = disp->tam_y - (p2->height/2 + disp->chao);
 			p2->jump = false;
+			p2->stamina -= 10;
 		}
 
 		//atualiza o valor do salto para efeito da gravidade
 		p2->jump_height -= 0.01;
-	} else if(keys[84] && p2->attack == 0  && !p2->recuo && p2->y == disp->tam_y - (p2->height/2 + disp->chao))//p2 em posicao valida para saltar
+	} else if(keys[84] && p2->attack == 0  && !p2->recuo && p2->y == disp->tam_y - (p2->height/2 + disp->chao) && p2->stamina >= 10)//p2 em posicao valida para saltar
 		p2->jump = true;
 
 	return;
@@ -245,6 +248,8 @@ void attack_1(player *atacando, player *vitima){
 
 	if((atacando->sprite_atual < atacando->i_sprites[6] - 1) || vitima->recuo)
 		return;
+
+	atacando->stamina -= 15;
 	
 	//indica se houve um hit
 	bool acerto = false;
@@ -271,6 +276,8 @@ void attack_1(player *atacando, player *vitima){
 void attack_2(player *atacando, player *vitima){
 	if((atacando->sprite_atual < atacando->i_sprites[7] - 1) || vitima->recuo)
 		return;
+
+	atacando->stamina-= 5;
 
 	//atacando para esqueda e vitima dentro do alcance e nao nao esta pulando
 	if(atacando->olha_esquerda && (!vitima->jump || abs(vitima->jump_height) < 0.2) && (vitima->x < atacando->x) && (vitima->x + vitima->side/2 > atacando->x - atacando->side/2 - atacando->attack_2[0])){

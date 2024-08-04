@@ -65,6 +65,8 @@ int main(int argc, char *argv[]){
 
 	al_start_timer(timer);
 
+	bool adiciona_stamina = false;
+
 	//roda até que o programa seja encerrado
 	while(!encerra){
 		//aguarda e obtem o proximo evento, assim como seu codigo
@@ -80,6 +82,8 @@ int main(int argc, char *argv[]){
 				encerra = tela_vitoria(&player_1, &player_2, disp, 2, timer, queue, &background, pressed_keys, font);
 			move_players(player_1, player_2, disp, pressed_keys);
 			imprime_background(background, disp);
+			imprime_stamina(disp, player_1, player_2, adiciona_stamina);
+			adiciona_stamina = adiciona_stamina ^ 1;
 			imprime_vida(disp, player_1, player_2);
 			imprime_score(player_1->vitorias, player_2->vitorias, disp, font);
 			imprime_players(player_1, player_2, pressed_keys, dev_mode, false);

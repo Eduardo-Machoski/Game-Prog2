@@ -259,6 +259,32 @@ void imprime_background(ALLEGRO_BITMAP *background, display_info *disp){
 	al_draw_scaled_bitmap(background, 0, 0, al_get_bitmap_width(background), al_get_bitmap_height(background), 0, 0, disp->tam_x, disp->tam_y, ALLEGRO_MIN_LINEAR);
 }
 
+//imprime a barra de stamina de ambos os players
+void imprime_stamina(display_info *disp, player *p1, player *p2, bool adiciona){
+	
+	//valores utilizados na impressao (melhora performance)
+	int disp_3 = disp->tam_x/3;
+	int disp_15 = disp->tam_x/10;
+	int disp_12_y = disp->tam_y/12 * 2 - disp->tam_y/25;
+	int disp_30_y = disp->tam_y/30 + disp->tam_y/12 - disp->tam_y/50;
+
+	//vida do player1
+	al_draw_filled_rectangle(disp_15 - 2, disp_30_y, disp_3 + 2, disp_12_y, al_map_rgb(255, 255, 255));
+	al_draw_filled_rectangle(disp_15, disp_30_y + 1, disp_15 + (disp_3 - disp_15) * p1->stamina/100.0, disp_12_y - 1, al_map_rgb(255, 127, 80));
+
+	//vida do player2
+	al_draw_filled_rectangle(2 * disp_3 - 2, disp_30_y, disp->tam_x - disp_15 + 2, disp_12_y, al_map_rgb(255, 255, 255));
+	al_draw_filled_rectangle(2 * disp_3 + (disp ->tam_x - disp_15 - 2 * disp_3) * (1.0 - p2->stamina/100.0), disp_30_y + 1, disp->tam_x - disp_15, disp_12_y - 1, al_map_rgb(255, 127, 80));
+
+
+	//aumenta um pouco a stamina do player caso nao esteja cheia
+	if(adiciona && p1->stamina < 100)
+		p1->stamina += 1;
+	if(adiciona && p2->stamina < 100)
+		p2->stamina += 1;
+
+}
+
 //imprime a barra de vida de ambos os players
 void imprime_vida(display_info *disp, player *p1, player *p2){
 
@@ -275,7 +301,6 @@ void imprime_vida(display_info *disp, player *p1, player *p2){
 	//vida do player2
 	al_draw_filled_rectangle(2 * disp_3 - 2, disp_30_y, disp->tam_x - disp_15 + 2, disp_12_y, al_map_rgb(255, 255, 255));
 	al_draw_filled_rectangle(2 * disp_3 + (disp ->tam_x - disp_15 - 2 * disp_3) * (1.0 - p2->vida/100.0), disp_30_y + 1, disp->tam_x - disp_15, disp_12_y - 1, al_map_rgb(255, 0, 0));
-
 }
 
 void imprime_selecao(display_info *disp, int p1, int p2, int backi, ALLEGRO_BITMAP *background){

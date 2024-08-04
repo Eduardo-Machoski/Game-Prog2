@@ -33,6 +33,10 @@ void imprime_players(player *p1, player *p2, bool *keys, bool hitbox, bool pause
 //imprime o background selecionado (tamanho da sprite 3440x1440 pixels)
 void imprime_background(ALLEGRO_BITMAP *background, display_info *disp);
 
+//imprime a barra de stamina de ambos os players
+//aumenta a stamina atual do player a cada 2 ciclos do timer 
+void imprime_stamina(display_info *disp, player *p1, player *p2, bool adiciona);
+
 //imprime a barra de vida de ambos os players
 void imprime_vida(display_info *disp, player *p1, player *p2);
 

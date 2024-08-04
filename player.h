@@ -47,7 +47,7 @@ typedef struct {
 player *cria_player(display_info *disp, int x_ini, bool esquerda, char *pasta);
 
 //verifica se o player pode atacar no momento, se sim atualiza o p->attack para indicar isso
-bool verifica_ataque(player *p1, player *p2, bool *keys, display_info *disp);
+void verifica_ataque(player *p1, player *p2, bool *keys, display_info *disp);
 
 //atualiza a posicao x e y dos players a partir dos seus controles
 void move_players(player *p1, player *p2, display_info *disp, bool *keys);
@@ -65,8 +65,7 @@ void seleciona_sprite(player *p, int player, bool keys[]);
 void orientacao_players(player *p1, player *p2, bool *keys);
 
 //reinicia a luta e contabiliza a vitoria de um personagem, caso um deles ganhe 2 round encerra a luta e mostra isso
-//retorna se o jogo deve ser encerrado (true se sim, false se nao)
-bool reset_round(player *ganhador, player *perdedor, display_info *disp);
+void reset_round(player *ganhador, player *perdedor, display_info *disp);
 
 //destroi um player e seus componentes
 player *destroy_player(player *elem);

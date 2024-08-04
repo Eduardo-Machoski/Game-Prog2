@@ -225,8 +225,35 @@ bool pause_gui(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *ti
 	return aux;
 }
 
-bool tela_vitoria(player *ganhador, player *perdedor, display_info *disp){
-	return false;
+
+bool tela_vitoria(player **p1, player **p2, display_info *disp, int num, ALLEGRO_TIMER *timer, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_BITMAP **background, bool keys[]){
+	//cria o menu que sera usado no display
+	menus *m;
+	if(!(m = cria_menu(3)))
+		return false;
+
+	//cria as strings do menu
+	char fala1[] = "new_game.png";
+	char fala2[] = "menu.png";
+	char fala3[] = "quit.png";
+
+	//inicializa as strings do menu
+	m->strings[0] = fala1;
+	m->strings[1] = fala2;
+	m->strings[2] = fala3;
+
+	//inicializa os codigos
+	m->codes[0] = NEW_GAME;
+       	m->codes[1] = MAIN_MENU;
+	m->codes[2] = EXIT_GAME;
+
+	//mostra o menu e realiza a operacao desejada pelo usuario
+	bool aux = display_menu(m, disp, queue, timer, p1, p2, keys, *background);
+
+	//destroi o menu apos o seu uso
+	destroy_menu(m);
+
+	return aux;
 }
 
 //destroi um menu e seus componentes

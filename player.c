@@ -112,7 +112,7 @@ player *cria_player(display_info *disp, int ini_x, bool esquerda, char *pasta){
 }
 
 //verifica se o player pode atacar no momento, se sim atualiza o p->attack para indicar isso
-bool verifica_ataque(player *p1, player *p2, bool *keys, display_info *disp){
+void verifica_ataque(player *p1, player *p2, bool *keys, display_info *disp){
 	if(!p1->jump && !p1->crouch  && !p1->recuo && p1->attack == 0){ //verifica se o p1 pode atacar
 		if(keys[ALLEGRO_KEY_Z]){//ataque alto
 			p1->attack = 1;
@@ -144,7 +144,7 @@ bool verifica_ataque(player *p1, player *p2, bool *keys, display_info *disp){
 	//verifica se o p1 venceu o round
 	if(p2->vida <= 0){
 		p2->vida = 0;
-		return reset_round(p1, p2, disp);
+		reset_round(p1, p2, disp);
 	}
 
 	//verifica hits dos ataques do p2
@@ -156,9 +156,8 @@ bool verifica_ataque(player *p1, player *p2, bool *keys, display_info *disp){
 	//verifica se o p2 venceu o round
 	if(p1->vida <= 0){
 		p1->vida = 0;
-		return reset_round(p2, p1, disp);
+		reset_round(p2, p1, disp);
 	}
-	return false;
 }
 
 //atualiza a posicao x e y dos players a partir de seus controles
@@ -376,11 +375,7 @@ void orientacao_players(player *p1, player *p2, bool *keys){
 }
 
 //reinicia a luta e contapiliza a vitoria de um personagem, caso um deles ganhe 2 wounds enverra a luta e mostra tela de vitoria
-//retorna se o jogo deve ser encerrado (true se sim)
-bool reset_round(player *ganhador, player *perdedor, display_info *disp){
-	if(ganhador->vitorias == 1)
-		return tela_vitoria(ganhador, perdedor, disp);
-
+void reset_round(player *ganhador, player *perdedor, display_info *disp){
 	//reinicia a posicao x dos jogadores com base na posicao atual
 	if(ganhador->x < perdedor->x){
 		ganhador->x = disp->tam_x * 0.1;
@@ -424,8 +419,6 @@ bool reset_round(player *ganhador, player *perdedor, display_info *disp){
 
 	//atualiza o numero de vitorias go ganhador
 	ganhador->vitorias += 1;
-	
-	return false;
 }
 
 //destroi um player e seus componentes

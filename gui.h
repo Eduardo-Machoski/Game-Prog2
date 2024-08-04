@@ -19,6 +19,7 @@ typedef struct {
 #define MAIN_MENU 1
 #define EXIT_GAME 2
 #define START_GAME 3
+#define NEW_GAME 4
 
 
 //cria um menu e inicializa suas informacoes
@@ -33,7 +34,9 @@ bool selecao_personagem(display_info *disp, player **p1, player **p2, ALLEGRO_BI
 //pausa o jogo, remove todos os innputs ainda nao processados
 bool pause_gui(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *timer, player **p1, player **p2, bool keys[], ALLEGRO_BITMAP *background);
 
-bool tela_vitoria(player *ganhador, player *perdedor, display_info *disp);
+//Diz quem foi o ganhador, realiza animacao de morte do perdedor e verifica se quer jogar outra, retornar ao menu
+//ou sair do jogo
+bool tela_vitoria(player **p1, player **p2, display_info *disp, int num, ALLEGRO_TIMER *timer, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_BITMAP **background, bool keys[]);
 
 
 //destroi um menu e seus componentes

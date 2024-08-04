@@ -168,6 +168,8 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 			{//pressiona 'ENTER'
 				if(m->codes[atual] == MAIN_MENU)
 					retorno = main_menu(queue, disp, timer, true, p1, p2, keys, background);
+				else if(m->codes[atual] == NEW_GAME)
+					retorno = selecao_personagem(disp, p1, p2, &background, queue, timer);
 				else if(m->codes[atual] == EXIT_GAME)
 					retorno = true;
 				continua = false;

@@ -249,7 +249,9 @@ void attack_1(player *atacando, player *vitima){
 	if((atacando->sprite_atual < atacando->i_sprites[6] - 1) || vitima->recuo)
 		return;
 
-	atacando->stamina -= 15;
+	atacando->stamina -= 30/atacando->frames;
+	if(atacando->stamina < 0)
+		atacando->stamina = 0;
 	
 	//indica se houve um hit
 	bool acerto = false;
@@ -277,7 +279,9 @@ void attack_2(player *atacando, player *vitima){
 	if((atacando->sprite_atual < atacando->i_sprites[7] - 1) || vitima->recuo)
 		return;
 
-	atacando->stamina-= 5;
+	atacando->stamina-= 20/atacando->frames;
+	if(atacando->stamina < 0)
+		atacando->stamina = 0;
 
 	//atacando para esqueda e vitima dentro do alcance e nao nao esta pulando
 	if(atacando->olha_esquerda && (!vitima->jump || abs(vitima->jump_height) < 0.2) && (vitima->x < atacando->x) && (vitima->x + vitima->side/2 > atacando->x - atacando->side/2 - atacando->attack_2[0])){

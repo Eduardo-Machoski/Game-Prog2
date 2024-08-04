@@ -52,6 +52,9 @@ void verifica_ataque(player *p1, player *p2, bool *keys, display_info *disp);
 //atualiza a posicao x e y dos players a partir dos seus controles
 void move_players(player *p1, player *p2, display_info *disp, bool *keys);
 
+//atualiza a posicao x e y do player1 a partir dos seus controles
+void move_player_single(player *p1, display_info *disp, bool *keys);
+
 //verifica se o atacando aceta o ataque 1 (alto) na vitima
 void attack_1(player *atacando, player *vitima);
 
@@ -62,7 +65,7 @@ void attack_2(player *atacando, player *vitima);
 void seleciona_sprite(player *p, int player, bool keys[]);
 
 //verifica qual a orientacao dos players (esquerda ou direita)
-void orientacao_players(player *p1, player *p2, bool *keys);
+void orientacao_player(player *p1, bool *keys, int player);
 
 //reinicia a luta e contabiliza a vitoria de um personagem, caso um deles ganhe 2 round encerra a luta e mostra isso
 void reset_round(player *ganhador, player *perdedor, display_info *disp);

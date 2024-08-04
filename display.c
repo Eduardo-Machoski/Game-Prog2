@@ -101,7 +101,7 @@ void full_screen(display_info *d, bool borda, ALLEGRO_EVENT_QUEUE *queue){
 }
 
 //imprime um menu na tela e obtem inputs do usuario para realizar as operaçoes disponiveis em cada menu
-bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER *timer, player **p1, player **p2, bool keys[], ALLEGRO_BITMAP *background){
+bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER *timer, player **p1, player **p2, bool keys[], ALLEGRO_BITMAP *background, bool *single){
 
 	//para os ticks do timer enquanto o menu estiver aberto
 	al_stop_timer(timer);
@@ -125,7 +125,8 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 	while(continua){
 		if(background != NULL){
 			imprime_background(background, disp);
-			imprime_players(*p1, *p2, keys, false, true);
+			imprime_players(*p1, keys, false, true, 1);
+			imprime_players(*p2, keys, false, true, 2);
 		}
 		//imprime as opçoes do menu
 		for(int i = 0; i < m->opcoes; i++){
@@ -145,8 +146,12 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 				exit(1);
 			}
 
-			//imprime o botao em escala
-			al_draw_scaled_bitmap(button, 0, 0, 600, 200, disp->tam_x/3, disp->tam_y/5 * (i + 1), disp->tam_x/3, disp->tam_y/6, ALLEGRO_MIN_LINEAR);	
+
+			//imprime os botoes em escala
+			if(m->codes[i] != BOSS)
+				al_draw_scaled_bitmap(button, 0, 0, 600, 200, disp->tam_x/3, disp->tam_y/5 * (i + 1), disp->tam_x/3, disp->tam_y/6, ALLEGRO_MIN_LINEAR);	
+			else
+				al_draw_scaled_bitmap(button, 0, 0, 55, 57, 4 * disp->tam_x/9, disp->tam_y/5 * (i + 1), disp->tam_y/6, disp->tam_y/6, ALLEGRO_MIN_LINEAR);
 			
 			//destroi o bitmap do botao
 			al_destroy_bitmap(button);
@@ -167,7 +172,9 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 			else if (event.keyboard.keycode == 67)
 			{//pressiona 'ENTER'
 				if(m->codes[atual] == MAIN_MENU)
-					retorno = main_menu(queue, disp, timer, true, p1, p2, keys, background);
+					retorno = main_menu(queue, disp, timer, true, p1, p2, keys, background, single);
+				else if(m->codes[atual] == BOSS)
+					*single = true;
 				else if(m->codes[atual] == NEW_GAME)
 					retorno = selecao_personagem(disp, p1, p2, &background, queue, timer);
 				else if(m->codes[atual] == EXIT_GAME)
@@ -195,11 +202,10 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 }
 
 //imprime ambos os players na tela
-void imprime_players(player *p1, player *p2, bool *keys, bool hitbox, bool pause){
+void imprime_players(player *p1, bool *keys, bool hitbox, bool pause, int player){
 	if(hitbox){
 	//imprime hitbox
 		al_draw_rectangle(p1->x - p1->side / 2, p1->y - p1->height/2, p1->x + p1->side/2, p1->y + p1->height/2, al_map_rgb(0, 0, 255), 0);
-		al_draw_rectangle(p2->x - p2->side / 2, p2->y - p2->height/2, p2->x + p2->side/2, p2->y + p2->height/2, al_map_rgb(255, 0, 0), 0);
 
 		//hitbox attack_1 p1
 		if((p1->attack == 1)){
@@ -209,49 +215,29 @@ void imprime_players(player *p1, player *p2, bool *keys, bool hitbox, bool pause
 				al_draw_rectangle(p1->x + p1->side/2 + p1->attack_1[0], p1->y - p1->attack_1[1]/2, p1->x + p1->side/2, p1->y + p1->attack_1[1]/2, al_map_rgb(255,0,0), 1);
 		}
 
-		//hitbox attack_1 p2
-		if((p2->attack == 1)){
-			if(p2->olha_esquerda)
-				al_draw_rectangle(p2->x - p2->side/2 - p2->attack_1[0], p2->y - p2->attack_1[1]/2, p2->x - p2->side/2, p2->y + p2->attack_1[1]/2, al_map_rgb(255,0,0), 1);
-			else
-				al_draw_rectangle(p2->x + p2->side/2 + p2->attack_1[0], p2->y - p2->attack_1[1]/2, p2->x + p2->side/2, p2->y + p2->attack_1[1]/2, al_map_rgb(255,0,0), 1);
-		}
-		
 		//hitbox attack_2 p1
 		if((p1->attack == 2)){
 			if(p1->olha_esquerda)
-				al_draw_rectangle(p1->x - p1->side/2 - p1->attack_2[0], p1->y - p2->attack_2[1]/2, p1->x - p1->side/2, p1->y + p1->attack_2[1]/2, al_map_rgb(255,0,0), 1);
+				al_draw_rectangle(p1->x - p1->side/2 - p1->attack_2[0], p1->y - p1->attack_2[1]/2, p1->x - p1->side/2, p1->y + p1->attack_2[1]/2, al_map_rgb(255,0,0), 1);
 			else
 				al_draw_rectangle(p1->x + p1->side/2 + p1->attack_2[0], p1->y - p1->attack_2[1]/2, p1->x + p1->side/2, p1->y + p1->attack_2[1]/2, al_map_rgb(255,0,0), 1);
 		}
 
-		//hitbox attack_2 p2
-		if((p2->attack == 2)){
-			if(p2->olha_esquerda)
-				al_draw_rectangle(p2->x - p2->side/2 - p2->attack_2[0], p2->y - p2->attack_2[1]/2, p2->x - p2->side/2, p2->y + p2->attack_2[1]/2, al_map_rgb(255,0,0), 1);
-			else
-				al_draw_rectangle(p2->x + p2->side/2 + p2->attack_2[0], p2->y - p2->attack_2[1]/2, p2->x + p2->side/2, p2->y + p2->attack_2[1]/2, al_map_rgb(255,0,0), 1);
-		}
 	}
 
 	//verifica se o jogo nao esta pausado para mudar a sprite
-	if(!pause){
+	if(!pause)
 		//seleciona a sprite correta a ser impressa nesse ciclo
-		seleciona_sprite(p1, 1, keys);
-		seleciona_sprite(p2, 2, keys);
-	}
+		seleciona_sprite(p1, player, keys);
+
 	//verifica qual a orientacao do player (esquerda ou direita)
-	orientacao_players(p1, p2, keys);
+	orientacao_player(p1, keys, player);
 
 	//imprime os players
 	if(p1->olha_esquerda)
 		al_draw_scaled_bitmap(p1->sprite, 0, 0, p1->sprite_w, p1->sprite_h, p1->x - p1->side_sprite/2, p1->y - p1->height_sprite/2, p1->side_sprite, p1->height_sprite, ALLEGRO_MIN_LINEAR ^ ALLEGRO_FLIP_HORIZONTAL);	
 	else
 		al_draw_scaled_bitmap(p1->sprite, 0, 0, p1->sprite_w, p1->sprite_h, p1->x - p1->side_sprite/2, p1->y - p1->height_sprite/2, p1->side_sprite, p1->height_sprite, ALLEGRO_MIN_LINEAR);
-	if(p2->olha_esquerda)
-		al_draw_scaled_bitmap(p2->sprite, 0, 0, p2->sprite_w, p2->sprite_h, p2->x - p2->side_sprite/2, p2->y - p2->height_sprite/2, p2->side_sprite, p2->height_sprite, ALLEGRO_MIN_LINEAR ^ ALLEGRO_FLIP_HORIZONTAL);
-	else
-		al_draw_scaled_bitmap(p2->sprite, 0, 0, p2->sprite_w, p2->sprite_h, p2->x - p2->side_sprite/2, p2->y - p2->height_sprite/2, p2->side_sprite, p2->height_sprite, ALLEGRO_MIN_LINEAR);
 }
 
 //imprime o background selecionado (tamanho da sprite 3440x1440 pixels)
@@ -269,11 +255,11 @@ void imprime_stamina(display_info *disp, player *p1, player *p2, bool adiciona){
 	int disp_12_y = disp->tam_y/12 * 2 - disp->tam_y/25;
 	int disp_30_y = disp->tam_y/30 + disp->tam_y/12 - disp->tam_y/50;
 
-	//vida do player1
+	//stamina do player1
 	al_draw_filled_rectangle(disp_15 - 2, disp_30_y, disp_3 + 2, disp_12_y, al_map_rgb(255, 255, 255));
 	al_draw_filled_rectangle(disp_15, disp_30_y + 1, disp_15 + (disp_3 - disp_15) * p1->stamina/100.0, disp_12_y - 1, al_map_rgb(255, 127, 80));
 
-	//vida do player2
+	//stamina do player2
 	al_draw_filled_rectangle(2 * disp_3 - 2, disp_30_y, disp->tam_x - disp_15 + 2, disp_12_y, al_map_rgb(255, 255, 255));
 	al_draw_filled_rectangle(2 * disp_3 + (disp ->tam_x - disp_15 - 2 * disp_3) * (1.0 - p2->stamina/100.0), disp_30_y + 1, disp->tam_x - disp_15, disp_12_y - 1, al_map_rgb(255, 127, 80));
 
@@ -284,6 +270,25 @@ void imprime_stamina(display_info *disp, player *p1, player *p2, bool adiciona){
 	if(adiciona && p2->stamina < 100)
 		p2->stamina += 1;
 
+}
+
+//imprime a barra de stamina do playe1r
+//aumenta a stamina atual dos players a cada 2 ciclos do timer
+void imprime_stamina_single(display_info *disp, player *p1, bool adiciona){
+	
+	//valores utilizados na impressao (melhora performance)
+	int disp_3 = disp->tam_x/3;
+	int disp_15 = disp->tam_x/10;
+	int disp_12_y = disp->tam_y/12 * 2 - disp->tam_y/25;
+	int disp_30_y = disp->tam_y/30 + disp->tam_y/12 - disp->tam_y/50;
+
+	//stamina do player1
+	al_draw_filled_rectangle(disp_15 - 2, disp_30_y, disp_3 + 2, disp_12_y, al_map_rgb(255, 255, 255));
+	al_draw_filled_rectangle(disp_15, disp_30_y + 1, disp_15 + (disp_3 - disp_15) * p1->stamina/100.0, disp_12_y - 1, al_map_rgb(255, 127, 80));
+
+	//aumenta um pouco a stamina do player caso nao esteja cheia
+	if(adiciona && p1->stamina < 100)
+		p1->stamina += 1;
 }
 
 //imprime a barra de vida de ambos os players
@@ -302,6 +307,20 @@ void imprime_vida(display_info *disp, player *p1, player *p2){
 	//vida do player2
 	al_draw_filled_rectangle(2 * disp_3 - 2, disp_30_y, disp->tam_x - disp_15 + 2, disp_12_y, al_map_rgb(255, 255, 255));
 	al_draw_filled_rectangle(2 * disp_3 + (disp ->tam_x - disp_15 - 2 * disp_3) * (1.0 - p2->vida/100.0), disp_30_y + 1, disp->tam_x - disp_15, disp_12_y - 1, al_map_rgb(255, 0, 0));
+}
+
+//imprime a barra de vida do player1
+void imprime_vida_single(display_info *disp, player *p1){
+
+	//valores utilizados na impressao (melhora performance)
+	int disp_3 = disp->tam_x/3;
+	int disp_15 = disp->tam_x/15;
+	int disp_12_y = disp->tam_y/12;
+	int disp_30_y = disp->tam_y/30;
+
+	//vida do player1
+	al_draw_filled_rectangle(disp_15 - 2, disp_30_y, disp_3 + 2, disp_12_y, al_map_rgb(255, 255, 255));
+	al_draw_filled_rectangle(disp_15, disp_30_y + 1, disp_15 + (disp_3 - disp_15) * p1->vida/100.0, disp_12_y - 1, al_map_rgb(0, 0, 255));
 }
 
 void imprime_selecao(display_info *disp, int p1, int p2, int backi, ALLEGRO_BITMAP *background){
@@ -382,6 +401,67 @@ void imprime_selecao(display_info *disp, int p1, int p2, int backi, ALLEGRO_BITM
 	al_flip_display();
 }
 
+//imprime a selecao de personagem no single player
+void imprime_selecao_single(display_info *disp, int p1, int backi, ALLEGRO_BITMAP *background){
+	imprime_background(background, disp);
+
+	//bitmaps auxiliares
+	ALLEGRO_BITMAP *vermelho = al_load_bitmap("Sprites/Selection/vermelho.png");
+	ALLEGRO_BITMAP *branco = al_load_bitmap("Sprites/Selection/branco.png");
+
+	int w = al_get_bitmap_width(vermelho);
+      	int h = al_get_bitmap_height(vermelho);	
+	//subbitmaps com a parte do bitmap que sera impressa
+	ALLEGRO_BITMAP *sub_vermelho = al_create_sub_bitmap(vermelho, 3 * w/5, 3 * h/4, w/5, h/4);
+	ALLEGRO_BITMAP *sub_branco = al_create_sub_bitmap(branco, 3 * w/5, 3 * h/4, w/5, h/4);
+	
+	ALLEGRO_BITMAP *atual;
+
+	//imprime a selecao do player
+	for(int i = 0; i < 4; i++){
+		if(i == p1)
+			atual = sub_vermelho;
+		else
+			atual = sub_branco;
+		int inicial = disp->tam_x/4 + (i * disp->tam_x/6 - disp->tam_x/12);
+		al_draw_scaled_bitmap(atual, 0, 0, al_get_bitmap_width(atual), al_get_bitmap_height(atual), inicial, disp->tam_y/4, disp->tam_x/6, disp->tam_y/4, 0); 
+	}
+
+	//destoi os subbitmaps
+	al_destroy_bitmap(sub_vermelho);
+	al_destroy_bitmap(sub_branco);
+
+	//destroi os bitmaps auxiliares
+	al_destroy_bitmap(vermelho);
+	al_destroy_bitmap(branco);
+
+	//cria bitmaps com os icones dos herois
+	ALLEGRO_BITMAP *fantasy = al_load_bitmap("Sprites/Selection/fantasy_warrior.png");	
+	ALLEGRO_BITMAP *hero_1 = al_load_bitmap("Sprites/Selection/martial_hero.png");	
+	ALLEGRO_BITMAP *hero_2 = al_load_bitmap("Sprites/Selection/martial_hero_3.png");	
+	ALLEGRO_BITMAP *warrior = al_load_bitmap("Sprites/Selection/medieval_warrior.png");	
+	
+	//imprime o fantasy warrior
+	al_draw_scaled_bitmap(fantasy, 0, 0, al_get_bitmap_width(fantasy), al_get_bitmap_height(fantasy), disp->tam_x/4 - disp->tam_x/18, disp->tam_y/4 + disp->tam_y/24, disp->tam_x/8, disp->tam_y/6, 0);
+
+	//imprime o heroi 1
+	al_draw_scaled_bitmap(hero_1, 0, 0, al_get_bitmap_width(fantasy), al_get_bitmap_height(fantasy), disp->tam_x/4 - disp->tam_x/18 + disp->tam_x/6, disp->tam_y/4 + disp->tam_y/24, disp->tam_x/8, disp->tam_y/6, 0);
+	
+	//imprime o heroi 2
+	al_draw_scaled_bitmap(hero_2, 0, 0, al_get_bitmap_width(fantasy), al_get_bitmap_height(fantasy), disp->tam_x/4 - disp->tam_x/18 + disp->tam_x/3, disp->tam_y/4 + disp->tam_y/24, disp->tam_x/8, disp->tam_y/6, 0);
+	
+	//imprime o warrior
+	al_draw_scaled_bitmap(warrior, 0, 0, al_get_bitmap_width(fantasy), al_get_bitmap_height(fantasy), disp->tam_x/4 - disp->tam_x/18 + disp->tam_x/2, disp->tam_y/4 + disp->tam_y/24, disp->tam_x/8, disp->tam_y/6, 0);
+
+	//detroi os bitmaps dos icones dos herois
+	al_destroy_bitmap(fantasy);
+	al_destroy_bitmap(hero_1);
+	al_destroy_bitmap(hero_2);
+	al_destroy_bitmap(warrior);
+
+	//atualiza a tela
+	al_flip_display();
+}
 void imprime_score(int n1, int n2, display_info *disp, ALLEGRO_FONT *font){
 
 	//cria o texto do score do player1

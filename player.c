@@ -239,8 +239,50 @@ void move_players(player *p1, player *p2, display_info  *disp, bool *keys){
 		p2->jump_height -= 0.01;
 	} else if(keys[84] && p2->attack == 0  && !p2->recuo && p2->y == disp->tam_y - (p2->height/2 + disp->chao) && p2->stamina >= 10)//p2 em posicao valida para saltar
 		p2->jump = true;
+}
 
-	return;
+//atualiza a posicao x e y do player1 a partir de seus controles
+void move_player_single(player *p1, display_info  *disp, bool *keys){
+
+	int half_side_p1 = p1->side/2;
+
+	//divisor da velocidade (1 velocidade normal, 2 velociadade diminuida)
+	int crouch_1 = 1;
+
+	//verifica se o player1 esta agachado e atualiza a velociadade
+	if(p1->attack == 0 && !p1->jump  && !p1->recuo && keys[ALLEGRO_KEY_S]){
+		p1->crouch = true;
+		crouch_1 = 2;
+	} else{
+		p1->crouch = false;
+	}
+
+	if(p1->attack == 0 && !p1->recuo){
+		//atualiza a posicao x do player1
+		p1->x += (VELOCIDADE_X/crouch_1) * (keys[4] - keys[1]);
+		//verifica colisao do player1 com a borda da tela nas laterais
+		if(p1->x < half_side_p1 || p1->x > disp->tam_x - half_side_p1)
+			p1->x = half_side_p1 * keys[1] + (disp->tam_x - half_side_p1) * keys[4];
+	}
+
+	//verifica se o p1 esta saltando
+	if(p1->jump){
+		
+		//atualiza posicao vertical de p1
+		p1->y -= disp->tam_y * p1->jump_height;
+
+		//verifica se o pulo foi encerrado
+		if(p1->jump_height <= -(VELOCIDADE_MAX_Y - 0.005)){
+			p1->jump_height = VELOCIDADE_MAX_Y;
+			p1->y = disp->tam_y - (p1->height/2 + disp->chao);
+			p1->jump = false;
+			p1->stamina -= 10;
+		}
+
+		//atualiza o valor do salto para efeito da gravidade
+		p1->jump_height -= 0.01;
+	} else if(keys[23] && p1->attack  == 0 && !p1->recuo && p1->y == disp->tam_y - (p1->height/2 + disp->chao) && p1->stamina >= 10)//p1 em posicao valida para saltar
+		p1->jump = true;
 }
 
 //verifica se o atancdo acerta o ataque 1 (alto) na vitima
@@ -371,18 +413,19 @@ void seleciona_sprite(player *p, int player, bool keys[]){
 }
 
 //verifica qual a orientacao dos players (esquerda ou direita)
-void orientacao_players(player *p1, player *p2, bool *keys){
-	//orientaçao do p1
-	if(p1-> attack == 0 && keys[1] && !keys[4])
-		p1->olha_esquerda = true;
-	else if(p1->attack == 0 && !keys[1] && keys[4])
-		p1->olha_esquerda = false;
-
-	//orientacao do p2
-	if(p2->attack == 0 && keys[82] && !keys[83])
-		p2->olha_esquerda = true;
-	else if(p2->attack == 0 && keys[83] && !keys[82])
-		p2->olha_esquerda = false;
+void orientacao_player(player *p1, bool *keys, int player){
+	if(player == 1){
+		//orientaçao do p1
+		if(p1-> attack == 0 && keys[1] && !keys[4])
+			p1->olha_esquerda = true;
+		else if(p1->attack == 0 && !keys[1] && keys[4])
+			p1->olha_esquerda = false;
+	} else{
+		if(p1->attack == 0 && keys[82] && !keys[83])
+			p1->olha_esquerda = true;
+		else if(p1->attack == 0 && keys[83] && !keys[82])
+			p1->olha_esquerda = false;
+	}
 }
 
 //reinicia a luta e contapiliza a vitoria de um personagem, caso um deles ganhe 2 wounds enverra a luta e mostra tela de vitoria

@@ -10,6 +10,7 @@
 #include"player.h"
 #include"gui.h"
 #include"display.h"
+#include"single.h"
 
 int main(int argc, char *argv[]){
 	bool dev_mode = false;
@@ -43,9 +44,11 @@ int main(int argc, char *argv[]){
 	//background a ser selecionado na selecao de personagens
 	ALLEGRO_BITMAP *background = NULL;
 
+	bool single = false;
+
 	//abre o menu principal no inicio do jogo
 	//caso a variavel encerra == true, encerra o programa
-	bool encerra = main_menu(queue, disp, timer, false, NULL, NULL, pressed_keys, background);
+	bool encerra = main_menu(queue, disp, timer, false, NULL, NULL, pressed_keys, background, &single);
 
 	//evento atual sendo lidado no loop
 	ALLEGRO_EVENT event;
@@ -60,7 +63,7 @@ int main(int argc, char *argv[]){
 
 	//seleçao de personagem caso "Start Game" seja selecionado
 	//seleciona background tambem
-	if(!encerra)
+	if(!encerra && !single)
 		encerra = selecao_personagem(disp, &player_1, &player_2, &background, queue, timer);
 
 	al_start_timer(timer);
@@ -69,48 +72,58 @@ int main(int argc, char *argv[]){
 
 	//roda até que o programa seja encerrado
 	while(!encerra){
-		//aguarda e obtem o proximo evento, assim como seu codigo
-		al_wait_for_event(queue, &event);
-		code = event.type;
-		
-		//tick do timer
-		if(code == 30){
-			verifica_ataque(player_1, player_2, pressed_keys, disp);
-			move_players(player_1, player_2, disp, pressed_keys);
-			imprime_background(background, disp);
-			imprime_stamina(disp, player_1, player_2, adiciona_stamina);
-			adiciona_stamina = adiciona_stamina ^ 1;
-			imprime_vida(disp, player_1, player_2);
-			imprime_score(player_1->vitorias, player_2->vitorias, disp, font);
-			imprime_players(player_1, player_2, pressed_keys, dev_mode, false);
-			al_flip_display();
-			if(player_1->vitorias == 2)
-				encerra = tela_vitoria(&player_1, &player_2, disp, 1, timer, queue, &background, pressed_keys, font);
-			else if (player_2->vitorias == 2)
-				encerra = tela_vitoria(&player_1, &player_2, disp, 2, timer, queue, &background, pressed_keys, font);
-		} else if(code == 10){ //tecla pressionada
-			//atualiza o controle de movimento dos personagens
-			pressed_keys[event.keyboard.keycode] = 1;
 
-			//pressiona 'f11' para obter tela full-screen
-			if(event.keyboard.keycode == 57){
-				al_unregister_event_source(queue, al_get_display_event_source(disp->disp));
-				if(disp->full)
-					full_screen(disp, true, queue);
-				else
-					full_screen(disp, false, queue);
-				al_register_event_source(queue, al_get_display_event_source(disp->disp));
-			}
+		if(!single){
+			//aguarda e obtem o proximo evento, assim como seu codigo
+			al_wait_for_event(queue, &event);
+			code = event.type;
+			
+			//tick do timer
+			if(code == 30){
+				verifica_ataque(player_1, player_2, pressed_keys, disp);
+				move_players(player_1, player_2, disp, pressed_keys);
+				imprime_background(background, disp);
+				imprime_stamina(disp, player_1, player_2, adiciona_stamina);
+				adiciona_stamina = adiciona_stamina ^ 1;
+				imprime_vida(disp, player_1, player_2);
+				imprime_score(player_1->vitorias, player_2->vitorias, disp, font);
+				imprime_players(player_1, pressed_keys, dev_mode, false, 1);
+				imprime_players(player_2, pressed_keys, dev_mode, false, 2);
+				al_flip_display();
+				if(player_1->vitorias == 2)
+					encerra = tela_vitoria(&player_1, &player_2, disp, 1, timer, queue, &background, pressed_keys, font, &single);
+				else if (player_2->vitorias == 2)
+					encerra = tela_vitoria(&player_1, &player_2, disp, 2, timer, queue, &background, pressed_keys, font, &single);
+			} else if(code == 10){ //tecla pressionada
+				//atualiza o controle de movimento dos personagens
+				pressed_keys[event.keyboard.keycode] = 1;
 
-			//pressiona 'esc' para pausar o jogo e abrir o menu de pausa
-			if(event.keyboard.keycode == 59)
-				encerra = pause_gui(queue, disp, timer, &player_1, &player_2, pressed_keys, background);
+				//pressiona 'f11' para obter tela full-screen
+				if(event.keyboard.keycode == 57){
+					al_unregister_event_source(queue, al_get_display_event_source(disp->disp));
+					if(disp->full)
+						full_screen(disp, true, queue);
+					else
+						full_screen(disp, false, queue);
+					al_register_event_source(queue, al_get_display_event_source(disp->disp));
+				}
 
-		} else if(code == 12){ // tecla liberada
-			//atualiza o controle de movimento dos personagens
-			pressed_keys[event.keyboard.keycode] = 0;
-		} else if(code == 42) //botao de fechar pressionado
-			encerra = true;
+				//pressiona 'esc' para pausar o jogo e abrir o menu de pausa
+				if(event.keyboard.keycode == 59)
+					encerra = pause_gui(queue, disp, timer, &player_1, &player_2, pressed_keys, background, &single);
+
+			} else if(code == 12){ // tecla liberada
+				//atualiza o controle de movimento dos personagens
+				pressed_keys[event.keyboard.keycode] = 0;
+			} else if(code == 42) //botao de fechar pressionado
+				encerra = true;
+		} else {
+			encerra = single_player(disp, queue, timer, &background, pressed_keys, &player_1, &single, dev_mode);
+
+			//caso o player saia do single player e queira jogar multiplayer
+			if(!encerra && !single)
+				selecao_personagem(disp, &player_1, &player_2, &background, queue, timer);
+		}
 	}
 
 	//destroi os jogadores e seus componentes

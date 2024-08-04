@@ -4,11 +4,14 @@ nome = game
 
 all: $(nome)
 
-$(nome): main.o display.o gui.o player.o
-	gcc -o $(nome) main.o display.o gui.o player.o $(flags) $(allegro)
+$(nome): main.o single.o display.o gui.o player.o
+	gcc -o $(nome) main.o display.o gui.o player.o single.o $(flags) $(allegro)
 
 main.o: main.c
 	gcc -c main.c $(flags) $(allegro)
+
+single.o: single.h single.c
+	gcc -c single.c $(flags) $(allegro)
 
 display.o: display.h display.c
 	gcc -c display.c $(flags) $(allegro)

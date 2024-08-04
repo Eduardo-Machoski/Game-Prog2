@@ -33,26 +33,29 @@ menus *cria_menu(int tam){
 }
 
 //menu principal do jogo
-bool main_menu(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *timer, bool reset, player **p1, player **p2, bool keys[], ALLEGRO_BITMAP *background){
+bool main_menu(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *timer, bool reset, player **p1, player **p2, bool keys[], ALLEGRO_BITMAP *background, bool *single){
 	//cria o menu que sera usado no display
 	menus *m;
-	if(!(m = cria_menu(2)))
+	if(!(m = cria_menu(3)))
 		return false;
 
 	//cria as strings do menu
+	char fala0[] = "skull.png";
 	char fala1[] = "new_game.png";
 	char fala2[] = "quit.png";
 
 	//inicializa as strings do menu
-	m->strings[0] = fala1;
-	m->strings[1] = fala2;
+	m->strings[0] = fala0;
+	m->strings[1] = fala1;
+	m->strings[2] = fala2;
 
 	//inicializa os codigos
-	m->codes[0] = START_GAME;
-       	m->codes[1] = EXIT_GAME;
+	m->codes[0] = BOSS;
+	m->codes[1] = START_GAME;
+       	m->codes[2] = EXIT_GAME;
 	
 	//mostra o menu e realiza a operacao desejada pelo usuario
-	bool aux = display_menu(m, disp, queue, timer, p1, p2, keys, background);
+	bool aux = display_menu(m, disp, queue, timer, p1, p2, keys, background, single);
 
 	//menu aberto apos uma partida ter sido iniciada
 	if(reset)
@@ -193,8 +196,104 @@ bool selecao_personagem(display_info *disp, player **p1, player **p2, ALLEGRO_BI
 	return retorno;
 }
 
+bool selecao_single(display_info *disp, player **p1, ALLEGRO_BITMAP **background, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER *timer){
+	//pausa o timer do jogo
+	al_stop_timer(timer);
+
+	//variaveis que controlam qual personagem os players estao selecionando atualmente
+	int p1_i = 0;
+
+	//variavel que controla o background selecionado
+	int back = 0;
+
+	//verifica se a aplicação nao foi fechada
+	bool retorno = false;
+
+	*background = al_load_bitmap("Sprites/Background/background_1.png");
+
+	//imprime a tela de selecao de personagens
+	imprime_selecao_single(disp, p1_i, back, *background);
+
+	ALLEGRO_EVENT event;
+	al_wait_for_event(queue, &event);
+
+	bool encerra = false;
+	
+	//inicia o jogo se "ENTER" for pressionado
+	while(!encerra){
+		al_wait_for_event(queue, &event);
+
+		//atualiza a selecao atual dos players
+		if(event.type == 10){
+			if(event.keyboard.keycode == ALLEGRO_KEY_A){
+				if(p1_i != 0)
+					p1_i--;
+				else
+					p1_i = 3;
+			}
+			else if(event.keyboard.keycode == ALLEGRO_KEY_D){
+				if(p1_i != 3)
+					p1_i++;
+				else
+					p1_i = 0;
+			}
+			else if(event.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
+				full_screen(disp, disp->full, queue);
+			else if(event.keyboard.keycode == ALLEGRO_KEY_ENTER)
+				encerra = true;
+			else if(event.keyboard.keycode == ALLEGRO_KEY_2 && back == 1){
+				al_destroy_bitmap(*background);
+				*background = al_load_bitmap("Sprites/Background/background_2.png");
+				back = 0;
+			} else if(event.keyboard.keycode == ALLEGRO_KEY_1 && back == 0){
+				al_destroy_bitmap(*background);
+				*background = al_load_bitmap("Sprites/Background/background_1.png");
+				back = 1;
+			}
+			imprime_selecao_single(disp, p1_i, back, *background);
+		}
+
+		//verifica se a aplicacao foi fechada
+		if(event.type == 42){
+			retorno = true;
+			encerra = true;
+		}
+	}
+
+	//players com personagens ja selecionados	
+	*p1 = destroy_player(*p1);
+
+	//indica a pasta do personagem selecionado pelo player 1
+	char *pasta_1 = malloc(sizeof(char) * 1000);
+	pasta_1[0] = '\0';
+
+	//indica a pasta de sprites
+	strcat(pasta_1, "Sprites/");
+
+	//indica a pasta correta do player 1
+	if(p1_i == 0)
+		strcat(pasta_1, "Fantasy_Warrior/");
+	else if(p1_i == 1)
+		strcat(pasta_1, "Martial_Hero/");
+	else if(p1_i == 2)
+		strcat(pasta_1, "Martial_Hero_3/");
+	else
+		strcat(pasta_1, "Medieval_Warrior/");
+
+	//cria p1 e p2
+	*p1 = cria_player(disp, 10, false, pasta_1);
+
+	//destroi a string que indicava a pasta dos players
+	free(pasta_1);
+
+	//reinicia o timer do jogo
+	al_start_timer(timer);
+
+	return retorno;
+}
+
 //pausa o jogo, removendo todos os inputs ainda nao processados
-bool pause_gui(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *timer, player **p1, player **p2, bool keys[], ALLEGRO_BITMAP *background){
+bool pause_gui(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *timer, player **p1, player **p2, bool keys[], ALLEGRO_BITMAP *background, bool *single){
 
 	//cria o menu que sera usado no display
 	menus *m;
@@ -217,7 +316,7 @@ bool pause_gui(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *ti
 	m->codes[2] = EXIT_GAME;
 
 	//mostra o menu e realiza a operacao desejada pelo usuario
-	bool aux = display_menu(m, disp, queue, timer, p1, p2, keys, background);
+	bool aux = display_menu(m, disp, queue, timer, p1, p2, keys, background, single);
 
 	//destroi o menu apos o seu uso
 	destroy_menu(m);
@@ -226,7 +325,7 @@ bool pause_gui(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *ti
 }
 
 
-bool tela_vitoria(player **p1, player **p2, display_info *disp, int num, ALLEGRO_TIMER *timer, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_BITMAP **background, bool keys[], ALLEGRO_FONT *font){
+bool tela_vitoria(player **p1, player **p2, display_info *disp, int num, ALLEGRO_TIMER *timer, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_BITMAP **background, bool keys[], ALLEGRO_FONT *font, bool *single){
 
 
 	//realiza a animacao de morte do player derrotado e idle do outro.
@@ -257,7 +356,7 @@ bool tela_vitoria(player **p1, player **p2, display_info *disp, int num, ALLEGRO
 	m->codes[2] = EXIT_GAME;
 
 	//mostra o menu e realiza a operacao desejada pelo usuario
-	bool aux = display_menu(m, disp, queue, timer, p1, p2, keys, *background);
+	bool aux = display_menu(m, disp, queue, timer, p1, p2, keys, *background, single);
 
 	//destroi o menu apos o seu uso
 	destroy_menu(m);

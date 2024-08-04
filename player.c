@@ -256,7 +256,7 @@ void attack_1(player *atacando, player *vitima){
 		acerto = true;
 
 	if(acerto){
-		vitima->vida -= 10;
+		vitima->vida -= 50;
 		vitima->recuo = true;
 		vitima->attack = 0;
 		vitima->attack_done = true;
@@ -376,20 +376,22 @@ void orientacao_players(player *p1, player *p2, bool *keys){
 
 //reinicia a luta e contapiliza a vitoria de um personagem, caso um deles ganhe 2 wounds enverra a luta e mostra tela de vitoria
 void reset_round(player *ganhador, player *perdedor, display_info *disp){
-	//reinicia a posicao x dos jogadores com base na posicao atual
-	if(ganhador->x < perdedor->x){
-		ganhador->x = disp->tam_x * 0.1;
-		ganhador->olha_esquerda = false;
-		perdedor->x = disp->tam_x * 0.9;
-		perdedor->olha_esquerda = true;
-	} else{
-		
-		ganhador->x = disp->tam_x * 0.9;
-		ganhador->olha_esquerda = true;
-		perdedor->x = disp->tam_x * 0.1;
-		perdedor->olha_esquerda = false;
-	}
 
+	if(ganhador->vitorias == 0){
+		//reinicia a posicao x dos jogadores com base na posicao atual
+		if(ganhador->x < perdedor->x){
+			ganhador->x = disp->tam_x * 0.1;
+			ganhador->olha_esquerda = false;
+			perdedor->x = disp->tam_x * 0.9;
+			perdedor->olha_esquerda = true;
+		} else{
+			
+			ganhador->x = disp->tam_x * 0.9;
+			ganhador->olha_esquerda = true;
+			perdedor->x = disp->tam_x * 0.1;
+			perdedor->olha_esquerda = false;
+		}
+	}
 	//reinicia a pos_y dos jogadores
 	ganhador->y = disp->tam_y  - disp->chao - ganhador->height/2;
 	perdedor->y = disp->tam_y  - disp->chao - perdedor->height/2;

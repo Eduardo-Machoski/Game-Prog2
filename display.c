@@ -374,6 +374,82 @@ void imprime_score(int n1, int n2, display_info *disp, ALLEGRO_FONT *font){
 	al_draw_text(font, al_map_rgb(255, 0, 0), 2 * disp->tam_x/3 - 20, disp->tam_y/19, ALLEGRO_ALIGN_RIGHT, score);
 }
 
+//realiza a animacao de morte do player derrotado(p1) e idle do outro(p2)
+////imprime o texto indicando qual o ganhador
+void animacao_morte(player *p1, player *p2, display_info *disp, ALLEGRO_FONT *font, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_BITMAP *background, char num){
+	ALLEGRO_EVENT event;
+
+	//animacao de morte do derrotado
+	p1->sprite_atual = p1->i_sprites[8];
+	p1->tempo_ciclo = 0;
+
+	//animacao idle do ganhador
+	p2->sprite_atual = 0;
+	p2->tempo_ciclo = 0;
+
+	//numero de sprites na animacao idle do ganhador
+	int aux = p2->i_sprites[1];
+
+	//cor do texto de vitoria de um player
+	ALLEGRO_COLOR color;
+	if(num == '2')
+		color = al_map_rgb(255, 0, 0);
+	else
+		color = al_map_rgb(0, 0, 255);
+
+	char text[15] = "Player   Wins!";
+	text[7] = num;
+
+	//encerra o ciclo quando acaha a animacao de morte do perdedor
+	while(p1->sprite_atual < p1->num_sprites){
+		al_wait_for_event(queue, &event);
+
+		if(event.type == 30){
+
+			//imprime o background
+			imprime_background(background, disp);
+
+			//imprime o texto indicando o vencedor
+			al_draw_text(font, color, disp->tam_x/2, disp->tam_y/2, ALLEGRO_ALIGN_CENTRE, text);
+
+			//imprime os players
+			if(p1->olha_esquerda)
+				al_draw_scaled_bitmap(p1->sprite, 0, 0, p1->sprite_w, p1->sprite_h, p1->x - p1->side_sprite/2, p1->y - p1->height_sprite/2, p1->side_sprite, p1->height_sprite, ALLEGRO_MIN_LINEAR ^ ALLEGRO_FLIP_HORIZONTAL);	
+			else
+				al_draw_scaled_bitmap(p1->sprite, 0, 0, p1->sprite_w, p1->sprite_h, p1->x - p1->side_sprite/2, p1->y - p1->height_sprite/2, p1->side_sprite, p1->height_sprite, ALLEGRO_MIN_LINEAR);
+			if(p2->olha_esquerda)
+				al_draw_scaled_bitmap(p2->sprite, 0, 0, p2->sprite_w, p2->sprite_h, p2->x - p2->side_sprite/2, p2->y - p2->height_sprite/2, p2->side_sprite, p2->height_sprite, ALLEGRO_MIN_LINEAR ^ ALLEGRO_FLIP_HORIZONTAL);
+			else
+				al_draw_scaled_bitmap(p2->sprite, 0, 0, p2->sprite_w, p2->sprite_h, p2->x - p2->side_sprite/2, p2->y - p2->height_sprite/2, p2->side_sprite, p2->height_sprite, ALLEGRO_MIN_LINEAR);
+
+			al_flip_display();
+
+			//anda na animacao de morte do perdedor	
+			if(p1->tempo_ciclo >= p1->frames * 2){
+				p1->sprite_atual = p1->sprite_atual + 1;
+				p1->tempo_ciclo = 0;
+
+				//atualiza o subbitmap
+				al_destroy_bitmap(p1->sprite);
+				p1->sprite = al_create_sub_bitmap(p1->bitmap, p1->sprite_w * p1->sprite_atual, 0, p1->sprite_w * (p1->sprite_atual + 1), p1->sprite_h);
+			} else
+				p1->tempo_ciclo += 1;
+
+			//anda na animacao idle do ganhador
+			if(p2->tempo_ciclo >= p2->frames * 2){
+				p2->sprite_atual = (p2->sprite_atual + 1) % aux;
+				p2->tempo_ciclo = 0;
+
+				//atualzia o subbitmap
+				al_destroy_bitmap(p2->sprite);
+				p2->sprite = al_create_sub_bitmap(p2->bitmap, p2->sprite_w * p2->sprite_atual, 0, p2->sprite_w * (p2->sprite_atual + 1), p2->sprite_h);
+			} else
+				p2->tempo_ciclo += 1;
+
+		}
+	}
+} 
+
 //destroi um display_info e todos os seus componentes
 void destroy_display_info(display_info *d){
 	//destroi o display do allegro

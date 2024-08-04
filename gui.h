@@ -36,7 +36,7 @@ bool pause_gui(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *ti
 
 //Diz quem foi o ganhador, realiza animacao de morte do perdedor e verifica se quer jogar outra, retornar ao menu
 //ou sair do jogo
-bool tela_vitoria(player **p1, player **p2, display_info *disp, int num, ALLEGRO_TIMER *timer, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_BITMAP **background, bool keys[]);
+bool tela_vitoria(player **p1, player **p2, display_info *disp, int num, ALLEGRO_TIMER *timer, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_BITMAP **background, bool keys[], ALLEGRO_FONT *font);
 
 
 //destroi um menu e seus componentes

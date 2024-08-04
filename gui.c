@@ -226,7 +226,16 @@ bool pause_gui(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *ti
 }
 
 
-bool tela_vitoria(player **p1, player **p2, display_info *disp, int num, ALLEGRO_TIMER *timer, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_BITMAP **background, bool keys[]){
+bool tela_vitoria(player **p1, player **p2, display_info *disp, int num, ALLEGRO_TIMER *timer, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_BITMAP **background, bool keys[], ALLEGRO_FONT *font){
+
+
+	//realiza a animacao de morte do player derrotado e idle do outro.
+	//imprime o texto indicando qual o ganhador
+	if(num == 2)	
+		animacao_morte(*p1, *p2, disp, font, queue, *background, 50);
+	else
+		animacao_morte(*p2, *p1, disp, font, queue, *background, 49);
+
 	//cria o menu que sera usado no display
 	menus *m;
 	if(!(m = cria_menu(3)))

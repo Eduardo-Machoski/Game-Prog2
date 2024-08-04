@@ -42,6 +42,10 @@ void imprime_selecao(display_info *disp, int p1, int p2, int back, ALLEGRO_BITMA
 //imprime o score dos players (ex: 0 x 0)
 void imprime_score(int n1, int n2, display_info *disp, ALLEGRO_FONT *font);
 
+//realiza a animacao de morte do player derrotado(p1) e idle do outro(p2)
+//imprime o texto indicando qual o ganhador
+void animacao_morte(player *p1, player *p2, display_info *disp, ALLEGRO_FONT *font, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_BITMAP *background, char num);
+
 //destroi um display_info e todos os seus componentes
 void destroy_display_info(display_info *d);
 

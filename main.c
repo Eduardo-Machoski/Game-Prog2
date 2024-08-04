@@ -75,9 +75,9 @@ int main(int argc, char *argv[]){
 		if(code == 30){
 			verifica_ataque(player_1, player_2, pressed_keys, disp);
 			if(player_1->vitorias == 2)
-				encerra = tela_vitoria(&player_1, &player_2, disp, 1, timer, queue, &background, pressed_keys);
+				encerra = tela_vitoria(&player_1, &player_2, disp, 1, timer, queue, &background, pressed_keys, font);
 			else if (player_2->vitorias == 2)
-				encerra = tela_vitoria(&player_1, &player_2, disp, 2, timer, queue, &background, pressed_keys);
+				encerra = tela_vitoria(&player_1, &player_2, disp, 2, timer, queue, &background, pressed_keys, font);
 			move_players(player_1, player_2, disp, pressed_keys);
 			imprime_background(background, disp);
 			imprime_vida(disp, player_1, player_2);

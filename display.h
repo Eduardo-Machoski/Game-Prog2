@@ -2,6 +2,7 @@
 #define __DISPLAY__
 
 #include<allegro5/allegro.h>
+#include<allegro5/allegro_ttf.h>
 #include<allegro5/allegro_image.h>
 
 typedef struct {
@@ -37,6 +38,9 @@ void imprime_vida(display_info *disp, player *p1, player *p2);
 
 //imprime a tela de selecao e qual a opcao atual dos players (baseado em p1_x p1_y...)
 void imprime_selecao(display_info *disp, int p1, int p2, int back, ALLEGRO_BITMAP *background);
+
+//imprime o score dos players (ex: 0 x 0)
+void imprime_score(int n1, int n2, display_info *disp, ALLEGRO_FONT *font);
 
 //destroi um display_info e todos os seus componentes
 void destroy_display_info(display_info *d);

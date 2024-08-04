@@ -3,7 +3,7 @@
 #include<stdbool.h>
 
 #include<allegro5/allegro.h>
-#include<allegro5/allegro_font.h>
+#include<allegro5/allegro_ttf.h>
 #include<allegro5/allegro_image.h>
 #include<allegro5/allegro_primitives.h>
 
@@ -20,12 +20,14 @@ int main(int argc, char *argv[]){
 	//inicializa os componentos do allegro
 	al_init();
 	al_init_primitives_addon();
+	al_init_ttf_addon();
 	al_init_image_addon();
 	al_install_keyboard();
 
 	//cria os componentes do allegro
 	ALLEGRO_TIMER* timer = al_create_timer(1.0/30.0);
 	ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
+	ALLEGRO_FONT* font = al_load_ttf_font("Sprites/Font/font.ttf", 40, ALLEGRO_TTF_MONOCHROME);
 
 	//cria o display e armazena suas informacoes
 	display_info *disp = cria_display();
@@ -75,6 +77,7 @@ int main(int argc, char *argv[]){
 			move_players(player_1, player_2, disp, pressed_keys);
 			imprime_background(background, disp);
 			imprime_vida(disp, player_1, player_2);
+			imprime_score(player_1->vitorias, player_2->vitorias, disp, font);
 			imprime_players(player_1, player_2, pressed_keys, dev_mode, false);
 			al_flip_display();
 		} else if(code == 10){ //tecla pressionada

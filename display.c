@@ -268,7 +268,7 @@ void imprime_vida(display_info *disp, player *p1, player *p2){
 
 	//vida do player1
 	al_draw_filled_rectangle(disp_15 - 2, disp_30_y, disp_3 + 2, disp_12_y, al_map_rgb(255, 255, 255));
-	al_draw_filled_rectangle(disp_15, disp_30_y + 1, disp_15 + (disp_3 - disp_15) * p1->vida/100.0, disp_12_y - 1, al_map_rgb(255,0,0));
+	al_draw_filled_rectangle(disp_15, disp_30_y + 1, disp_15 + (disp_3 - disp_15) * p1->vida/100.0, disp_12_y - 1, al_map_rgb(0, 0, 255));
 
 	//vida do player2
 	al_draw_filled_rectangle(2 * disp_3 - 2, disp_30_y, disp->tam_x - disp_15 + 2, disp_12_y, al_map_rgb(255, 255, 255));
@@ -352,6 +352,24 @@ void imprime_selecao(display_info *disp, int p1, int p2, int backi, ALLEGRO_BITM
 
 	//atualiza a tela
 	al_flip_display();
+}
+
+void imprime_score(int n1, int n2, display_info *disp, ALLEGRO_FONT *font){
+
+	//cria o texto do score do player1
+	char score[2];
+	score[0] = n1 + 48;
+	score[1] = '\0';
+
+	//imprime o score do player1
+	al_draw_text(font, al_map_rgb(0, 0, 255), disp->tam_x/3 + 20, disp->tam_y/19, ALLEGRO_ALIGN_LEFT, score);
+
+
+	//arruma o texto do score para o do player 2
+	score[0] = n2 + 48;
+
+	//imprime o score do player2
+	al_draw_text(font, al_map_rgb(255, 0, 0), 2 * disp->tam_x/3 - 20, disp->tam_y/19, ALLEGRO_ALIGN_RIGHT, score);
 }
 
 //destroi um display_info e todos os seus componentes

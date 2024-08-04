@@ -144,7 +144,7 @@ bool verifica_ataque(player *p1, player *p2, bool *keys, display_info *disp){
 	//verifica se o p1 venceu o round
 	if(p2->vida <= 0){
 		p2->vida = 0;
-		return reset_round(p2, p1, disp);
+		return reset_round(p1, p2, disp);
 	}
 
 	//verifica hits dos ataques do p2
@@ -382,7 +382,7 @@ bool reset_round(player *ganhador, player *perdedor, display_info *disp){
 		return tela_vitoria(ganhador, perdedor, disp);
 
 	//reinicia a posicao x dos jogadores com base na posicao atual
-	if(ganhador->x > perdedor->x){
+	if(ganhador->x < perdedor->x){
 		ganhador->x = disp->tam_x * 0.1;
 		ganhador->olha_esquerda = false;
 		perdedor->x = disp->tam_x * 0.9;
@@ -414,8 +414,8 @@ bool reset_round(player *ganhador, player *perdedor, display_info *disp){
 	perdedor->attack_done = true;
 	ganhador->recuo = false;
 	perdedor->recuo = false;
-	ganhador->jump_height = 0;
-	perdedor->jump_height = 0;
+	ganhador->jump_height = VELOCIDADE_MAX_Y;
+	perdedor->jump_height = VELOCIDADE_MAX_Y;
 	ganhador->jump = false;
 	perdedor->jump = false;
 	ganhador->crouch = false;

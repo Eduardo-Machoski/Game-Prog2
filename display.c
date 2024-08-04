@@ -260,6 +260,7 @@ void imprime_background(ALLEGRO_BITMAP *background, display_info *disp){
 }
 
 //imprime a barra de stamina de ambos os players
+//aumenta a stamina atual dos players a cada 2 ciclos do timer
 void imprime_stamina(display_info *disp, player *p1, player *p2, bool adiciona){
 	
 	//valores utilizados na impressao (melhora performance)

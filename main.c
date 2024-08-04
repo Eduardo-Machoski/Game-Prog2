@@ -76,10 +76,6 @@ int main(int argc, char *argv[]){
 		//tick do timer
 		if(code == 30){
 			verifica_ataque(player_1, player_2, pressed_keys, disp);
-			if(player_1->vitorias == 2)
-				encerra = tela_vitoria(&player_1, &player_2, disp, 1, timer, queue, &background, pressed_keys, font);
-			else if (player_2->vitorias == 2)
-				encerra = tela_vitoria(&player_1, &player_2, disp, 2, timer, queue, &background, pressed_keys, font);
 			move_players(player_1, player_2, disp, pressed_keys);
 			imprime_background(background, disp);
 			imprime_stamina(disp, player_1, player_2, adiciona_stamina);
@@ -88,6 +84,10 @@ int main(int argc, char *argv[]){
 			imprime_score(player_1->vitorias, player_2->vitorias, disp, font);
 			imprime_players(player_1, player_2, pressed_keys, dev_mode, false);
 			al_flip_display();
+			if(player_1->vitorias == 2)
+				encerra = tela_vitoria(&player_1, &player_2, disp, 1, timer, queue, &background, pressed_keys, font);
+			else if (player_2->vitorias == 2)
+				encerra = tela_vitoria(&player_1, &player_2, disp, 2, timer, queue, &background, pressed_keys, font);
 		} else if(code == 10){ //tecla pressionada
 			//atualiza o controle de movimento dos personagens
 			pressed_keys[event.keyboard.keycode] = 1;

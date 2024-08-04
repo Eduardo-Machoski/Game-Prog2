@@ -78,7 +78,8 @@ player *cria_player(display_info *disp, int ini_x, bool esquerda, char *pasta){
 	aux->side_sprite = (disp->tam_x / 16) * (width/tam_x);	
 	aux->height = disp->tam_y / 4;
 	aux->height_sprite = (disp->tam_y / 4) * (height/tam_y);
-	aux->vida = 1;
+	aux->stamina = 100;
+	aux->vida = 100;
 	aux->jump = false;
 	aux->jump_height = VELOCIDADE_MAX_Y;
 	aux->bitmap = bitmap;
@@ -96,6 +97,8 @@ player *cria_player(display_info *disp, int ini_x, bool esquerda, char *pasta){
 	aux->frames = frames;
 	aux->attack_1 = attack_1;
 	aux->attack_2 = attack_2;
+	aux->tempo_ciclo = 0;
+	aux->vitorias = 0;
 
 	//posicao horizontal inicial (ini_x% da tela)
 	aux->x = disp->tam_x * (ini_x/100.0);
@@ -109,7 +112,7 @@ player *cria_player(display_info *disp, int ini_x, bool esquerda, char *pasta){
 }
 
 //verifica se o player pode atacar no momento, se sim atualiza o p->attack para indicar isso
-void verifica_ataque(player *p1, player *p2, bool *keys){
+bool verifica_ataque(player *p1, player *p2, bool *keys, display_info *disp){
 	if(!p1->jump && !p1->crouch  && !p1->recuo && p1->attack == 0){ //verifica se o p1 pode atacar
 		if(keys[ALLEGRO_KEY_Z]){//ataque alto
 			p1->attack = 1;
@@ -132,16 +135,30 @@ void verifica_ataque(player *p1, player *p2, bool *keys){
 		}
 	}
 
-	//verifica hits dos ataques
+	//verifica hits dos ataques do p1
 	if(p1->attack == 1)
 		attack_1(p1, p2);
 	else if(p1->attack == 2)
 		attack_2(p1, p2);
 
+	//verifica se o p1 venceu o round
+	if(p2->vida <= 0){
+		p2->vida = 0;
+		return reset_round(p2, p1, disp);
+	}
+
+	//verifica hits dos ataques do p2
 	if(p2->attack == 1)
 		attack_1(p2, p1);
 	else if (p2->attack == 2)
 		attack_2(p2, p1);
+
+	//verifica se o p2 venceu o round
+	if(p1->vida <= 0){
+		p1->vida = 0;
+		return reset_round(p2, p1, disp);
+	}
+	return false;
 }
 
 //atualiza a posicao x e y dos players a partir de seus controles
@@ -221,122 +238,49 @@ void move_players(player *p1, player *p2, display_info  *disp, bool *keys){
 	} else if(keys[84] && p2->attack == 0  && !p2->recuo && p2->y == disp->tam_y - (p2->height/2 + disp->chao))//p2 em posicao valida para saltar
 		p2->jump = true;
 
-	//verifica e arruma colisao entre players
-	//colisao_players(p1, p2, keys);
-
 	return;
-}
-
-//verifica e arruma colisao entre players
-void colisao_players(player *p1, player *p2, bool *keys){
-	//verifica se osplayers estao na mesma altura relativa
-	if(p1->y > p2->y + p2->height * 0.45 || p2->y > p1->y + p1->height * 0.45)
-		return;
-
-	//verifica qual player está na esquerda e qual na direita em relacao ao outro
-	player *esq, *dir;
-	int esq_half, dir_half;
-
-	//guarda os movimentos dos players
-	bool esq_move_dir, dir_move_esq;
-	bool esq_move_esq, dir_move_dir;
-	if(p1->x < p2->x){
-		esq = p1;
-		dir = p2;
-		esq_half = p1->side / 2;
-		dir_half = p2->side / 2;
-		esq_move_dir = keys[4];
-		dir_move_esq = keys[82];
-		esq_move_esq = keys[1];
-		dir_move_dir = keys[83];
-	} else {
-		esq = p2;
-		dir = p1;
-		esq_half = p2->side / 2;
-		dir_half = p1->side / 2;
-		esq_move_dir = keys[83];
-		dir_move_esq = keys[1];
-		esq_move_esq = keys[82];
-		dir_move_dir = keys[4];
-	}
-
-	//sem colisao entre players
-	if(esq->x + esq_half <= dir->x - dir_half)
-		return;
-
-	//verifica se os players estao andando
-	if(!(dir_move_esq || esq_move_dir || esq_move_esq || dir_move_dir)){
-		if(dir->y < esq->y)
-			dir->x = esq->x + dir_half + esq_half;
-		else
-			esq->x = dir->x - (dir_half + esq_half);
-	} else if(!dir_move_dir && !esq_move_esq){//ambos os players sem input para o lado oposto da colisao
-		//player direito andando para esquerda e player esquerdo parado
-		if(!esq_move_dir){
-			dir->x = esq->x + dir_half + esq_half;
-		} else if(!dir_move_esq){//player esquerdo andando para direita e player direito parado
-			esq->x = dir->x - (dir_half + esq_half);
-		} else{ //ambos parados ou se movimentandoem em sentido de colisao
-			int collision = esq->x + (dir->x - esq->x)/2;
-			esq->x = collision - esq_half;
-			dir->x = collision + dir_half;
-		}
-	} else if(!dir_move_dir){//player esquerdo se afastando do direito
-		if(esq_move_dir) //player esquerdo parado
-			dir->x = esq->x + dir_half + esq_half;
-		else if(dir_move_esq){//ambos se movimentdando na mesma direcao
-			int collision = esq->x + (dir->x - esq->x)/2;
-			esq->x = collision - esq_half;
-			dir->x = collision + dir_half;
-		} else{//player direito parado
-			esq->x = dir->x - (dir_half + esq_half);
-		}
-	} else{//player direito se afalstando do esquerdo
-		if(dir_move_esq) //player direito parado
-			esq->x = dir->x - (esq_half + dir_half);
-		else if(esq_move_dir){//ambos se movimentando na mesma direcao
-			int collision = esq->x + (dir->x - esq->x)/2;
-			esq->x = collision - esq_half;
-			dir->x = collision + dir_half;
-		} else{//player esquerdo parado
-			dir->x = esq->x + (dir_half + esq_half);
-		}
-	}
 }
 
 //verifica se o atancdo acerta o ataque 1 (alto) na vitima
 void attack_1(player *atacando, player *vitima){
 
-	if((atacando->sprite_atual < atacando->i_sprites[6] - 2) || vitima->recuo)
+	if((atacando->sprite_atual < atacando->i_sprites[6] - 1) || vitima->recuo)
 		return;
+	
+	//indica se houve um hit
+	bool acerto = false;
 
 	//atacando para esqueda e vitima dentro do alcance e nao agachada
-	if(atacando->olha_esquerda && !vitima->crouch && (vitima->x < atacando->x) && (vitima->x + vitima->side/2 > atacando->x - atacando->side/2 - atacando->attack_1[0])){
-		vitima->vida -= 0.1;
+	if(atacando->olha_esquerda && !vitima->crouch && (vitima->x < atacando->x) && (vitima->x + vitima->side/2 > atacando->x - atacando->side/2 - atacando->attack_1[0]))
+		acerto = true;
+	else if(!atacando->olha_esquerda && !vitima->crouch && (vitima->x > atacando->x) && (vitima->x - vitima->side/2 < atacando->x + atacando->side/2 + atacando->attack_1[0])) //atacando para direita, vitima dentro do alcance e nao agachada
+		acerto = true;
+
+	if(acerto){
+		vitima->vida -= 10;
 		vitima->recuo = true;
 		vitima->attack = 0;
 		vitima->attack_done = true;
-	} else if(!atacando->olha_esquerda && !vitima->crouch && (vitima->x > atacando->x) && (vitima->x - vitima->side/2 < atacando->x + atacando->side/2 + atacando->attack_1[0])){ //atacando para direita, vitima dentro do alcance e nao agachada
-		vitima->vida -= 0.1;
-		vitima->recuo = true;
-		vitima->attack = 0;
-		vitima->attack_done = true;
-	} 
+
+		//interrompe o salto caso haja hit
+		if(vitima->jump && vitima->jump_height > 0)
+			vitima->jump_height = -vitima->jump_height;
+	}
 }
 
 //verifica se o atacando acerta o ataque 2 (baixo) na vitima
 void attack_2(player *atacando, player *vitima){
-	if((atacando->sprite_atual < atacando->i_sprites[7] - 2) || vitima->recuo)
+	if((atacando->sprite_atual < atacando->i_sprites[7] - 1) || vitima->recuo)
 		return;
 
 	//atacando para esqueda e vitima dentro do alcance e nao nao esta pulando
 	if(atacando->olha_esquerda && (!vitima->jump || abs(vitima->jump_height) < 0.2) && (vitima->x < atacando->x) && (vitima->x + vitima->side/2 > atacando->x - atacando->side/2 - atacando->attack_2[0])){
-		vitima->vida -= 0.05;
+		vitima->vida -= 5;
 		vitima->recuo = true;
 		vitima->attack = 0;
 		vitima->attack_done = true;
 	} else if(!atacando->olha_esquerda && (!vitima->jump && abs(vitima->jump_height) < 0.2) && (vitima->x > atacando->x) && (vitima->x - vitima->side/2 < atacando->x + atacando->side/2 + atacando->attack_2[0])){ //atacando para direita, vitima dentro do alcance e nao esta pulando
-		vitima->vida -= 0.05;
+		vitima->vida -= 5;
 		vitima->recuo = true;
 		vitima->attack = 0;
 		vitima->attack_done = true;
@@ -429,6 +373,59 @@ void orientacao_players(player *p1, player *p2, bool *keys){
 		p2->olha_esquerda = true;
 	else if(p2->attack == 0 && keys[83] && !keys[82])
 		p2->olha_esquerda = false;
+}
+
+//reinicia a luta e contapiliza a vitoria de um personagem, caso um deles ganhe 2 wounds enverra a luta e mostra tela de vitoria
+//retorna se o jogo deve ser encerrado (true se sim)
+bool reset_round(player *ganhador, player *perdedor, display_info *disp){
+	if(ganhador->vitorias == 1)
+		return tela_vitoria(ganhador, perdedor, disp);
+
+	//reinicia a posicao x dos jogadores com base na posicao atual
+	if(ganhador->x > perdedor->x){
+		ganhador->x = disp->tam_x * 0.1;
+		ganhador->olha_esquerda = false;
+		perdedor->x = disp->tam_x * 0.9;
+		perdedor->olha_esquerda = true;
+	} else{
+		
+		ganhador->x = disp->tam_x * 0.9;
+		ganhador->olha_esquerda = true;
+		perdedor->x = disp->tam_x * 0.1;
+		perdedor->olha_esquerda = false;
+	}
+
+	//reinicia a pos_y dos jogadores
+	ganhador->y = disp->tam_y  - disp->chao - ganhador->height/2;
+	perdedor->y = disp->tam_y  - disp->chao - perdedor->height/2;
+
+	//reinicia a vida dos jogadores
+	ganhador->vida = 100;
+	perdedor->vida = 100;
+
+	//reinicia a stamina dos jogadores
+	ganhador->stamina = 100;
+	perdedor->stamina = 100;
+
+	//reinicia os estados de ambos os jogadores
+	ganhador->attack = 0;
+	perdedor->attack = 0;
+	ganhador->attack_done = true;
+	perdedor->attack_done = true;
+	ganhador->recuo = false;
+	perdedor->recuo = false;
+	ganhador->jump_height = 0;
+	perdedor->jump_height = 0;
+	ganhador->jump = false;
+	perdedor->jump = false;
+	ganhador->crouch = false;
+	perdedor->crouch = false;
+
+
+	//atualiza o numero de vitorias go ganhador
+	ganhador->vitorias += 1;
+	
+	return false;
 }
 
 //destroi um player e seus componentes

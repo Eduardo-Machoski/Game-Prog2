@@ -71,7 +71,7 @@ int main(int argc, char *argv[]){
 		
 		//tick do timer
 		if(code == 30){
-			verifica_ataque(player_1, player_2, pressed_keys);
+			encerra = verifica_ataque(player_1, player_2, pressed_keys, disp);
 			move_players(player_1, player_2, disp, pressed_keys);
 			imprime_background(background, disp);
 			imprime_vida(disp, player_1, player_2);

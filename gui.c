@@ -225,6 +225,9 @@ bool pause_gui(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *ti
 	return aux;
 }
 
+bool tela_vitoria(player *ganhador, player *perdedor, display_info *disp){
+	return false;
+}
 
 //destroi um menu e seus componentes
 void destroy_menu(menus *m){

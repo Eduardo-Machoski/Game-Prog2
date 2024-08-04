@@ -33,6 +33,8 @@ bool selecao_personagem(display_info *disp, player **p1, player **p2, ALLEGRO_BI
 //pausa o jogo, remove todos os innputs ainda nao processados
 bool pause_gui(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *timer, player **p1, player **p2, bool keys[], ALLEGRO_BITMAP *background);
 
+bool tela_vitoria(player *ganhador, player *perdedor, display_info *disp);
+
 
 //destroi um menu e seus componentes
 void destroy_menu(menus *m);

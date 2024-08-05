@@ -14,6 +14,7 @@ typedef struct {
 } display_info;
 
 #include"gui.h"
+#include"single.h"
 
 //cria um novo display de tamanho tamx x tam_y
 //cria uma estrutura auxiliar para guardar informacoes do display
@@ -29,6 +30,9 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 
 //imprime ambos os players na tela
 void imprime_players(player *p1, bool *keys, bool hitbox, bool pause, int player);
+
+//imprime o boss do single player
+void imprime_boss(boss *b, bool hitbox);
 
 //imprime o background selecionado (tamanho da sprite 3440x1440 pixels)
 void imprime_background(ALLEGRO_BITMAP *background, display_info *disp);

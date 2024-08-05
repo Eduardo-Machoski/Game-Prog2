@@ -240,6 +240,27 @@ void imprime_players(player *p1, bool *keys, bool hitbox, bool pause, int player
 		al_draw_scaled_bitmap(p1->sprite, 0, 0, p1->sprite_w, p1->sprite_h, p1->x - p1->side_sprite/2, p1->y - p1->height_sprite/2, p1->side_sprite, p1->height_sprite, ALLEGRO_MIN_LINEAR);
 }
 
+
+//impirme o boss do single player
+void imprime_boss(boss *b, bool hitbox){
+	if(hitbox)
+	//imprime hitbox
+		al_draw_rectangle(b->x - b->side / 2, b->y - b->height/2, b->x + b->side/2, b->y + b->height/2, al_map_rgb(0, 0, 255), 0);
+	
+	/*
+	//verifica se o jogo nao esta pausado para mudar a sprite
+	if(!pause)
+		//seleciona a sprite correta a ser impressa nesse ciclo
+		seleciona_sprite(p1, player, keys);
+*/
+
+	//imprime os players
+	if(b->olha_esquerda)
+		al_draw_scaled_bitmap(b->sprite[0], 0, 0, b->sprite_w, b->sprite_h, b->x - b->side_sprite/2, b->y - b->height_sprite/2, b->side_sprite, b->height_sprite, ALLEGRO_MIN_LINEAR ^ ALLEGRO_FLIP_HORIZONTAL);	
+	else
+		al_draw_scaled_bitmap(b->sprite[0], 0, 0, b->sprite_w, b->sprite_h, b->x - b->side_sprite/2, b->y - b->height_sprite/2, b->side_sprite, b->height_sprite, ALLEGRO_MIN_LINEAR);
+}
+
 //imprime o background selecionado (tamanho da sprite 3440x1440 pixels)
 void imprime_background(ALLEGRO_BITMAP *background, display_info *disp){
 	al_draw_scaled_bitmap(background, 0, 0, al_get_bitmap_width(background), al_get_bitmap_height(background), 0, 0, disp->tam_x, disp->tam_y, ALLEGRO_MIN_LINEAR);

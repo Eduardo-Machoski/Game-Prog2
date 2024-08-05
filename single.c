@@ -16,6 +16,7 @@ bool single_player(display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER
 	boss *inimigo = cria_boss(disp);
 
 	int code;
+	int ciclo_atual = 0;
 	while(!encerra){
 
 		//aguarda e obtem o proximo evento, assim como seu codigo
@@ -30,7 +31,10 @@ bool single_player(display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER
 			adiciona_stamina = adiciona_stamina ^ 1;
 			imprime_vida_single(disp, *p);
 			imprime_players(*p, keys, dev_mode, false, 1);
+			imprime_boss(inimigo, dev_mode);
+			movimento_boss(inimigo, ciclo_atual, disp);
 			al_flip_display();
+			ciclo_atual = (ciclo_atual + 1) % 300;
 		} else if(code == 10){ //tecla pressionada
 			//atualiza o controle de movimento dos personagens
 			keys[event.keyboard.keycode] = 1;
@@ -60,6 +64,65 @@ bool single_player(display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER
 	destroy_boss(inimigo);
 	
 	return retorno;
+}
+
+
+//movimenta o bos (tanto animaçoes, quanto o estado de ataque)
+void movimento_boss(boss *b, int ciclo, display_info *disp){
+
+	//verifica se chegou no momento do boss atacar
+	if(ciclo == 50){
+		b->x = disp->tam_x * 90.0/100.0;
+		b->attack = BOLA;
+	}
+
+	if(b->attack != 0 && b->sprite_atual[b->attack] != b->num_sprites[b->attack] - 1){
+		//proximo bitmap no ciclo dos ataques
+		if(b->tempo_ciclo[b->attack] == 5){
+			b->tempo_ciclo[b->attack] = 0;
+			b->sprite_atual[b->attack] += 1;
+			al_destroy_bitmap(b->sprite[b->attack]);
+			b->sprite[b->attack] = al_create_sub_bitmap(b->bitmap[b->attack], al_get_bitmap_width(b->bitmap[b->attack])/b->num_sprites[b->attack] * b->sprite_atual[b->attack], 0, al_get_bitmap_width(b->bitmap[b->attack])/b->num_sprites[b->attack] * (b->sprite_atual[b->attack] + 1), al_get_bitmap_height(b->bitmap[b->attack]));
+		} else
+			b->tempo_ciclo[b->attack] += 1;
+	} else
+		b->attack = 0;
+
+	int num = status_boss(b);
+
+	bool troca = false;
+	//verifica se é necessario mudar a imagem por conta do tempo
+        if(b->tempo_ciclo[0] >= 5){
+                int num_sprites;
+                if(num < 4)
+                        num_sprites = b->i_sprites[num + 1] - b->i_sprites[num];
+                else
+                        num_sprites = b->num_sprites[0] - b->i_sprites[num];
+
+                //troca o indice da imagem (depende de qual animaçao esta ocorrendo no momento)
+                b->sprite_atual[0] = b->i_sprites[num] + ((b->sprite_atual[0] - b->i_sprites[num] + 1) % num_sprites);
+                troca = true;
+
+                //reinicia o tempo do ciclo atual
+                b->tempo_ciclo[0] = 0;
+        } else{
+                //acrescenta tempo no ciclo atual
+                b->tempo_ciclo[0] += 1;
+        }
+
+        //cria o subbitmap com a sprite selecionada para impressao do boss
+        if(troca){
+                al_destroy_bitmap(b->sprite[0]);
+                b->sprite[0] = al_create_sub_bitmap(b->bitmap[0], b->sprite_w * b->sprite_atual[0], 0, b->sprite_w * (b->sprite_atual[0] + 1), b->sprite_h);
+                if(!b->sprite[0])
+                        exit(1);
+        }
+
+}
+
+//verifica o status do boss e retona qual a animacao ele deve realiza no momento
+int status_boss(boss *b){
+	return 0;
 }
 
 boss *cria_boss(display_info *disp){
@@ -139,10 +202,10 @@ boss *cria_boss(display_info *disp){
 		exit(1);
 
         //inicializa o boss
-        aux->side = disp->tam_x / 12;
-        aux->side_sprite = (disp->tam_x / 12) * (width/tam_x);
-        aux->height = disp->tam_y / 3;
-        aux->height_sprite = (disp->tam_y / 3) * (height/tam_y);
+        aux->side = disp->tam_x / 16;
+        aux->side_sprite = (disp->tam_x / 16) * (width/tam_x);
+        aux->height = disp->tam_y / 4;
+        aux->height_sprite = (disp->tam_y / 4) * (height/tam_y);
         aux->vida = 100;
         aux->bitmap = bitmap;
         aux->sprite = sprite;

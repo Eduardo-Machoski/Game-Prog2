@@ -5,14 +5,6 @@
 #include<allegro5/allegro.h>
 #include<stdlib.h>
 
-#include"player.h"
-#include"display.h"
-
-#define SPRITES_BOSS 4
-#define BOLA 1
-#define OLHO 2
-#define COLUNA 3
-
 typedef struct{
 	int *i_sprites; //indica o indice inicial de cada grupo de sprits em uma animacao
         int *sprite_atual; //vetor dos indices das sprites que o boss imprimiu por ultimo
@@ -31,13 +23,28 @@ typedef struct{
         int sprite_h; //height da sprite
         bool olha_esquerda; //indica se a sprite esta olhando para a esquerda
         bool attack_done; //indica se um ataque ja foi concluido
-        char attack; //indica se um ataque esta sendo realizado e qual (0 se nao)
+        int attack; //indica se um ataque esta sendo realizado e qual (0 se nao)
 
 
 } boss;
 
+
+#include"player.h"
+#include"display.h"
+
+#define SPRITES_BOSS 4
+#define BOLA 1
+#define OLHO 2
+#define COLUNA 3
+
 //main do modo single player
 bool single_player(display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER *timer, ALLEGRO_BITMAP **background, bool keys[], player **p, bool *single, int dev_mode);
+
+//movimenta o boss (tanto as animações quanto o estado de ataque)
+void movimento_boss(boss *b, int ciclo, display_info *disp);
+
+//verifica o status do boss e retorna qual a animacao ele deve realizar no momento
+int status_boss(boss *b);
 
 //cria a struct do boss e inicializa ela
 boss *cria_boss(display_info *disp);

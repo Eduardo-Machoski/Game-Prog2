@@ -65,9 +65,6 @@ void ataques_boss(player *p, bool keys[], bool hitbox, boss *b);
 //sai do modo single player se main menu ou exit
 bool verifica_fim(player *p, boss *b, display_info *disp, ALLEGRO_TIMER *timer, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_BITMAP *background, bool keys[], ALLEGRO_FONT *font, bool *retorno, bool *single);
 
-void single_derrota(player *p, boss *b, ALLEGRO_FONT *font);
-void single_vitoria(player *p, boss *b, ALLEGRO_FONT *font);
-
 //destroi a struct do boss e todos os seus componentes
 void destroy_boss(boss *elem);
 

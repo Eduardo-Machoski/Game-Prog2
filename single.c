@@ -334,9 +334,9 @@ bool verifica_fim(player *p, boss *b, display_info *disp, ALLEGRO_TIMER *timer, 
         //realiza a animacao de morte do player derrotadoou do boss 
         //imprime o texto indicando se o player venceu ou perdeu
 	if(p->vida == 0)
-		single_derrota(p, b, font);
+		single_derrota(p, b, disp, font, queue, background);
 	else if(b->vida == 0)
-		single_vitoria(p, b, font);
+		single_vitoria(p, b, disp, font, queue, background);
 	else
 		return false;
         
@@ -369,9 +369,6 @@ bool verifica_fim(player *p, boss *b, display_info *disp, ALLEGRO_TIMER *timer, 
 
         return true;
 }
-
-void single_derrota(player *p, boss *b, ALLEGRO_FONT *font){}
-void single_vitoria(player *p, boss *b, ALLEGRO_FONT *font){}
 
 //destroi a struct do boss e todos os seus componentes
 void destroy_boss(boss *elem){

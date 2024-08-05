@@ -674,7 +674,133 @@ void animacao_morte(player *p1, player *p2, display_info *disp, ALLEGRO_FONT *fo
 
 		}
 	}
-} 
+}
+//animacao de morte do player e texto de derrota
+void single_derrota(player *p, boss *b, display_info *disp, ALLEGRO_FONT *font, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_BITMAP *background){
+
+	ALLEGRO_EVENT event;
+
+	//animacao de morte do derrotado
+	p->sprite_atual = p->i_sprites[8];
+	p->tempo_ciclo = 0;
+
+	//cor do texto de vitoria de um player
+	ALLEGRO_COLOR color = al_map_rgb(255, 0, 0);;
+
+	char text[9] = "DERROTA!\0";
+
+	int aux = 0;
+	b->attack = 0;
+	b->sprite_atual[0] = 0;
+
+	//encerra o ciclo quando acaha a animacao de morte do perdedor
+	while(p->sprite_atual < p->num_sprites){
+		al_wait_for_event(queue, &event);
+
+		if(event.type == 30){
+
+			//imprime o background
+			imprime_background(background, disp);
+
+			//imprime o texto indicando o vencedor
+			al_draw_text(font, color, disp->tam_x/2, disp->tam_y/2, ALLEGRO_ALIGN_CENTRE, text);
+
+			//imprime os players
+			if(p->olha_esquerda)
+				al_draw_scaled_bitmap(p->sprite, 0, 0, p->sprite_w, p->sprite_h, p->x - p->side_sprite/2, p->y - p->height_sprite/2, p->side_sprite, p->height_sprite, ALLEGRO_MIN_LINEAR ^ ALLEGRO_FLIP_HORIZONTAL);	
+			else
+				al_draw_scaled_bitmap(p->sprite, 0, 0, p->sprite_w, p->sprite_h, p->x - p->side_sprite/2, p->y - p->height_sprite/2, p->side_sprite, p->height_sprite, ALLEGRO_MIN_LINEAR);
+			
+			//atualiza a sprite do boss
+			movimento_boss(b, &aux, disp);
+
+			//imprime o boss
+			imprime_boss(b, false);
+
+			al_flip_display();
+
+			//anda na animacao de morte do perdedor	
+			if(p->tempo_ciclo >= p->frames * 2){
+				p->sprite_atual = p->sprite_atual + 1;
+				p->tempo_ciclo = 0;
+
+				//atualiza o subbitmap
+				al_destroy_bitmap(p->sprite);
+				p->sprite = al_create_sub_bitmap(p->bitmap, p->sprite_w * p->sprite_atual, 0, p->sprite_w * (p->sprite_atual + 1), p->sprite_h);
+			} else
+				p->tempo_ciclo += 1;
+
+		}
+	}
+}
+
+//animacao de morte do boss e texto de vitoria
+void single_vitoria(player *p, boss *b, display_info *disp, ALLEGRO_FONT *font, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_BITMAP *background){
+	ALLEGRO_EVENT event;
+
+	//animacao de morte do derrotado
+	b->sprite_atual[0] = b->i_sprites[4];
+	b->tempo_ciclo[0] = 0;
+
+	//animacao idle do ganhador
+	p->sprite_atual = 0;
+	p->tempo_ciclo = 0;
+
+	//numero de sprites na animacao idle do ganhador
+	int aux = p->i_sprites[1];
+
+	//cor do texto de vitoria de um player
+	ALLEGRO_COLOR color = al_map_rgb(0, 0, 255);
+
+	char text[9] = "VITORIA!\0";
+
+	//encerra o ciclo quando acaha a animacao de morte do perdedor
+	while(b->sprite_atual[0] < b->num_sprites[0]){
+		al_wait_for_event(queue, &event);
+
+		if(event.type == 30){
+
+			//imprime o background
+			imprime_background(background, disp);
+
+			//imprime o texto indicando o vencedor
+			al_draw_text(font, color, disp->tam_x/2, disp->tam_y/2, ALLEGRO_ALIGN_CENTRE, text);
+
+			if(p->olha_esquerda)
+				al_draw_scaled_bitmap(p->sprite, 0, 0, p->sprite_w, p->sprite_h, p->x - p->side_sprite/2, p->y - p->height_sprite/2, p->side_sprite, p->height_sprite, ALLEGRO_MIN_LINEAR ^ ALLEGRO_FLIP_HORIZONTAL);
+			else
+				al_draw_scaled_bitmap(p->sprite, 0, 0, p->sprite_w, p->sprite_h, p->x - p->side_sprite/2, p->y - p->height_sprite/2, p->side_sprite, p->height_sprite, ALLEGRO_MIN_LINEAR);
+
+			imprime_boss(b, false);
+
+			al_flip_display();
+
+			//anda na animacao de morte do perdedor	
+			if(b->tempo_ciclo[0] >= 10){
+				b->sprite_atual[0] = b->sprite_atual[0] + 1;
+				b->tempo_ciclo[0] = 0;
+
+				//atualiza o subbitmap
+				al_destroy_bitmap(b->sprite[0]);
+				b->sprite[0] = al_create_sub_bitmap(b->bitmap[0], b->sprite_w * b->sprite_atual[0], 0, b->sprite_w * (b->sprite_atual[0] + 1), b->sprite_h);
+			} else
+				b->tempo_ciclo[0] += 1;
+
+			//anda na animacao idle do ganhador
+			if(p->tempo_ciclo >= p->frames * 2){
+				p->sprite_atual = (p->sprite_atual + 1) % aux;
+				p->tempo_ciclo = 0;
+
+				//atualzia o subbitmap
+				al_destroy_bitmap(p->sprite);
+				p->sprite = al_create_sub_bitmap(p->bitmap, p->sprite_w * p->sprite_atual, 0, p->sprite_w * (p->sprite_atual + 1), p->sprite_h);
+			} else
+				p->tempo_ciclo += 1;
+
+		}
+	}
+
+}
 
 //destroi um display_info e todos os seus componentes
 void destroy_display_info(display_info *d){

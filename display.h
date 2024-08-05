@@ -66,6 +66,13 @@ void imprime_score(int n1, int n2, display_info *disp, ALLEGRO_FONT *font);
 //imprime o texto indicando qual o ganhador
 void animacao_morte(player *p1, player *p2, display_info *disp, ALLEGRO_FONT *font, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_BITMAP *background, char num);
 
+//animacao de morte do player e texto de derrota
+void single_derrota(player *p, boss *b, display_info *disp, ALLEGRO_FONT *font, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_BITMAP *cackground);
+
+//animacao de morte do boss e texto de vitoria
+void single_vitoria(player *p, boss *b, display_info *disp, ALLEGRO_FONT *font, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_BITMAP *cackground);
+
+
 //destroi um display_info e todos os seus componentes
 void destroy_display_info(display_info *d);
 

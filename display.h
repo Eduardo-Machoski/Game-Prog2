@@ -62,6 +62,9 @@ void imprime_selecao_single(display_info *disp, int p1, int back, ALLEGRO_BITMAP
 //imprime o score dos players (ex: 0 x 0)
 void imprime_score(int n1, int n2, display_info *disp, ALLEGRO_FONT *font);
 
+//imprime os ataques do boss do single player
+void imprime_ataque(ataque *attack, boss *b, bool hitbox);
+
 //realiza a animacao de morte do player derrotado(p1) e idle do outro(p2)
 //imprime o texto indicando qual o ganhador
 void animacao_morte(player *p1, player *p2, display_info *disp, ALLEGRO_FONT *font, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_BITMAP *background, char num);

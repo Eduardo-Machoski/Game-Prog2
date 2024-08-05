@@ -23,7 +23,6 @@ typedef struct {
 #define NEW_GAME 4
 #define BOSS 5
 
-
 //cria um menu e inicializa suas informacoes
 menus *cria_menu(int tam);
 

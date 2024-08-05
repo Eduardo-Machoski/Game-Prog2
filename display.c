@@ -127,6 +127,8 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 			imprime_background(background, disp);
 			imprime_players(*p1, keys, false, true, 1);
 			imprime_players(*p2, keys, false, true, 2);
+		} else{
+			al_clear_to_color(al_map_rgb(0, 0, 0));
 		}
 		//imprime as opçoes do menu
 		for(int i = 0; i < m->opcoes; i++){
@@ -175,7 +177,7 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 					retorno = main_menu(queue, disp, timer, true, p1, p2, keys, background, single);
 				else if(m->codes[atual] == BOSS)
 					*single = true;
-				else if(m->codes[atual] == NEW_GAME || m->codes[atual] == START_GAME){
+				else if(m->codes[atual] == NEW_GAME){
 					retorno = selecao_personagem(disp, p1, p2, &background, queue, timer);
 					*single = false;
 				}else if(m->codes[atual] == EXIT_GAME)
@@ -230,6 +232,8 @@ bool display_menu_single(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queu
 			imprime_background(background, disp);
 			imprime_players(p, keys, false, true, 1);
 			imprime_boss(b, false);
+		} else{
+			al_clear_to_color(al_map_rgb(0, 0, 0));
 		}
 		//imprime as opçoes do menu
 		for(int i = 0; i < m->opcoes; i++){
@@ -598,6 +602,23 @@ void imprime_score(int n1, int n2, display_info *disp, ALLEGRO_FONT *font){
 
 	//imprime o score do player2
 	al_draw_text(font, al_map_rgb(255, 0, 0), 2 * disp->tam_x/3 - 20, disp->tam_y/19, ALLEGRO_ALIGN_RIGHT, score);
+}
+
+//imprime os ataques do boss do single player
+void imprime_ataque(ataque *attack, boss *b, bool hitbox){
+	if(hitbox)
+		for(int i = 0; i < attack->num; i++)
+        	//imprime hitbox
+			if(attack->valido[i % 6])
+                		al_draw_rectangle(attack->pos_x[i % 6] - attack->tam_x / 2, attack->pos_y[i % 6] - attack->tam_y/2, attack->pos_x[i % 6] + attack->tam_x/2, attack->pos_y[i % 6] + attack->tam_x/2, al_map_rgb(0, 0, 255), 0);
+
+
+
+        //imprime os ataques
+	for(int i = 0; i < attack->num; i++)
+		if(attack->valido[i % 6])
+        		al_draw_scaled_bitmap(b->sprite[attack->code], 0, 0, al_get_bitmap_width(b->sprite[attack->code]), al_get_bitmap_height(b->sprite[attack->code]), attack->pos_x[i % 6] - attack->tam_x/2, attack->pos_y[i % 6] - attack->tam_y/2, attack->tam_x, attack->tam_y, ALLEGRO_MIN_LINEAR ^ ALLEGRO_FLIP_HORIZONTAL);
+	
 }
 
 //realiza a animacao de morte do player derrotado(p1) e idle do outro(p2)

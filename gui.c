@@ -10,10 +10,13 @@ menus *cria_menu(int tam){
 
 	//cria o vetor de codigos e verifica o alocamento de memoria
 	int *codes;
-	if(!(codes = calloc(0, sizeof(int) * tam))){
+	if(!(codes = malloc(sizeof(int) * tam))){
 		free(aux);
 		return NULL;
 	}
+
+	for(int i = 0; i < tam; i++)
+		codes[i] = 0;
 
 	//cria o vetor de strings e verifica o alocamento de memoria
 	char **strings;
@@ -55,7 +58,7 @@ bool main_menu(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *ti
        	m->codes[2] = EXIT_GAME;
 	
 	//mostra o menu e realiza a operacao desejada pelo usuario
-	bool aux = display_menu(m, disp, queue, timer, p1, p2, keys, background, single);
+	bool aux = display_menu(m, disp, queue, timer, p1, p2, keys, NULL, single);
 
 	//menu aberto apos uma partida ter sido iniciada
 	if(reset && !single)
@@ -152,10 +155,14 @@ bool selecao_personagem(display_info *disp, player **p1, player **p2, ALLEGRO_BI
 
 	//indica a pasta do personagem selecionado pelo player 1
 	char *pasta_1 = malloc(sizeof(char) * 1000);
+	if(!pasta_1)
+		exit(1);
 	pasta_1[0] = '\0';
 
 	//indica a pasta do personagem selecionado pelo player 2
 	char *pasta_2 = malloc(sizeof(char) * 1000);
+	if(!pasta_2)
+		exit(1);
 	pasta_2[0] = '\0';
 
 	//indica a pasta de sprites

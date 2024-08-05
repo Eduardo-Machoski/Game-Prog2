@@ -120,7 +120,7 @@ int main(int argc, char *argv[]){
 		} else {
 			encerra = single_player(disp, queue, timer, &background, font, pressed_keys, &player_1, &single, dev_mode);
 			//menu principal apos sair do modo single player
-			if(!encerra && !single)
+			if(!encerra)
 				encerra = main_menu(queue, disp, timer, true, &player_1, &player_2, pressed_keys, background, &single);
 		}
 	}

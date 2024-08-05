@@ -305,7 +305,7 @@ void attack_1(player *atacando, player *vitima){
 		acerto = true;
 
 	if(acerto){
-		vitima->vida -= 50;
+		vitima->vida -= 10;
 		vitima->recuo = true;
 		vitima->attack = 0;
 		vitima->attack_done = true;

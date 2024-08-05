@@ -58,7 +58,7 @@ bool main_menu(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *ti
 	bool aux = display_menu(m, disp, queue, timer, p1, p2, keys, background, single);
 
 	//menu aberto apos uma partida ter sido iniciada
-	if(reset)
+	if(reset && !single)
 		selecao_personagem(disp, p1, p2, &background, queue, timer);
 
 	//destroi o menu apos o seu uso
@@ -324,7 +324,8 @@ bool pause_gui(ALLEGRO_EVENT_QUEUE *queue, display_info *disp, ALLEGRO_TIMER *ti
 	return aux;
 }
 
-
+//Diz quem foi o ganhador, realiza a animacao de morte do perdedor e verifica se quer hogar outra, retornar ao menu
+//ou sair do jogo
 bool tela_vitoria(player **p1, player **p2, display_info *disp, int num, ALLEGRO_TIMER *timer, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_BITMAP **background, bool keys[], ALLEGRO_FONT *font, bool *single){
 
 

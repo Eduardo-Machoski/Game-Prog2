@@ -14,6 +14,7 @@ typedef struct {
 
 #include"player.h"
 #include"display.h"
+#include"single.h"
 
 #define RETURN_GAME 0
 #define MAIN_MENU 1

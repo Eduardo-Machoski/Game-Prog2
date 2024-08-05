@@ -1,7 +1,7 @@
 #include"single.h"
 
 //main do modo single player
-bool single_player(display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER *timer, ALLEGRO_BITMAP **background, bool keys[], player **p, bool *single, int dev_mode){
+bool single_player(display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER *timer, ALLEGRO_BITMAP **background, ALLEGRO_FONT *font, bool keys[], player **p, bool *single, int dev_mode){
 	
 	//player seleciona o heroi e o background
 	bool retorno = selecao_single(disp, p, background, queue, timer);
@@ -25,16 +25,44 @@ bool single_player(display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER
 
 		//tick do timer
 		if(code == 30){
+			//movimenta o player a partir dos inputs
 			move_player_single(*p , disp, keys);
+
+			//atualiza a sprite que deve ser impressa do boss, seu estado atual e posicao
+			movimento_boss(inimigo, &ciclo_atual, disp);
+
+			//verifica se o player realiza um ataque, se sim verifica se ha hit no boss
+			//verifica se o ataque ja acabou
+			ataque_player(*p, keys, dev_mode, inimigo);
+
+			//verifica se o boss realiza um ataque, se sim verifica se ha hit no player
+			//verifica se o ataque ja acabou
+			ataques_boss(*p, keys, dev_mode, inimigo);
+
+			//imprime o background
 			imprime_background(*background, disp);
-			imprime_stamina_single(disp, *p, adiciona_stamina);
+
+			//atauliza o controle do adicionamento de stamina
 			adiciona_stamina = adiciona_stamina ^ 1;
+
+			//imprime a vida do player
 			imprime_vida_single(disp, *p);
+
+			//imprime a vida do boss
+			imprime_vida_boss(disp, inimigo);
+
+			//imprime o player
 			imprime_players(*p, keys, dev_mode, false, 1);
+
+			//imprime o boss
 			imprime_boss(inimigo, dev_mode);
-			movimento_boss(inimigo, ciclo_atual, disp);
+
 			al_flip_display();
-			ciclo_atual = (ciclo_atual + 1) % 300;
+			if(inimigo->attack == 0)
+				ciclo_atual = (ciclo_atual + 1) % 101;
+
+			//verifica se o player ganhou ou perdeu
+			encerra = verifica_fim(*p, inimigo, disp, timer, queue, *background, keys, font, &retorno);
 		} else if(code == 10){ //tecla pressionada
 			//atualiza o controle de movimento dos personagens
 			keys[event.keyboard.keycode] = 1;
@@ -49,11 +77,6 @@ bool single_player(display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER
 				al_register_event_source(queue, al_get_display_event_source(disp->disp));
 			}
 
-			/*
-			//pressiona 'esc' para pausar o jogo e abrir o menu de pausa
-			if(event.keyboard.keycode == 59)
-				encerra = pause_gui(queue, disp, timer, &player_1, &player_2, pressed_keys, background, &single);
-*/
 		} else if(code == 12){ // tecla liberada
 			//atualiza o controle de movimento dos personagens
 			keys[event.keyboard.keycode] = 0;
@@ -68,25 +91,33 @@ bool single_player(display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER
 
 
 //movimenta o bos (tanto animaçoes, quanto o estado de ataque)
-void movimento_boss(boss *b, int ciclo, display_info *disp){
+void movimento_boss(boss *b, int *ciclo, display_info *disp){
 
 	//verifica se chegou no momento do boss atacar
-	if(ciclo == 50){
-		b->x = disp->tam_x * 90.0/100.0;
-		b->attack = BOLA;
+	if(*ciclo == 101){
+		b->x = disp->tam_x * 0.9;
+		b->attack = 1 + rand() % 3;
+		*ciclo = 0;
 	}
 
-	if(b->attack != 0 && b->sprite_atual[b->attack] != b->num_sprites[b->attack] - 1){
+	if(b->attack == COLUNA || b->attack == OLHO){
+		b->x = disp->tam_x/2;
+		b->y = disp->tam_y/3;
+	} else if(b->attack == BOLA){
+		b->x = disp->tam_x * 0.9;
+		b->y = disp->tam_y - disp->chao - b->height/2;
+	}
+
+	if(b->attack != 0){
 		//proximo bitmap no ciclo dos ataques
 		if(b->tempo_ciclo[b->attack] == 5){
 			b->tempo_ciclo[b->attack] = 0;
-			b->sprite_atual[b->attack] += 1;
+			b->sprite_atual[b->attack] = (b->sprite_atual[b->attack] + 1) % b->num_sprites[b->attack];
 			al_destroy_bitmap(b->sprite[b->attack]);
 			b->sprite[b->attack] = al_create_sub_bitmap(b->bitmap[b->attack], al_get_bitmap_width(b->bitmap[b->attack])/b->num_sprites[b->attack] * b->sprite_atual[b->attack], 0, al_get_bitmap_width(b->bitmap[b->attack])/b->num_sprites[b->attack] * (b->sprite_atual[b->attack] + 1), al_get_bitmap_height(b->bitmap[b->attack]));
 		} else
 			b->tempo_ciclo[b->attack] += 1;
-	} else
-		b->attack = 0;
+	}
 
 	int num = status_boss(b);
 
@@ -110,6 +141,10 @@ void movimento_boss(boss *b, int ciclo, display_info *disp){
                 b->tempo_ciclo[0] += 1;
         }
 
+	if(b->sprite_atual[0] == b->i_sprites[4] - 1 && b->tempo_ciclo[0] == 4){
+		b->recuo = false;
+		b->sprite_atual[0] = 0;
+	}
         //cria o subbitmap com a sprite selecionada para impressao do boss
         if(troca){
                 al_destroy_bitmap(b->sprite[0]);
@@ -122,7 +157,67 @@ void movimento_boss(boss *b, int ciclo, display_info *disp){
 
 //verifica o status do boss e retona qual a animacao ele deve realiza no momento
 int status_boss(boss *b){
-	return 0;
+	int retorno = 0;
+
+	if(b->attack == 0 && b->recuo) //boss tomou hit
+		retorno = 3;
+	else if(b->attack == COLUNA) //boss realizando o attack de coluna
+		retorno = 1;
+	else if(b->attack == BOLA) //boss realizando o attack de bola
+		retorno = 2;
+	else //boss realizando o attack de olhos
+		retorno = 0;
+
+	return retorno;
+}
+
+//verifica se o player realiza um ataque, se sim verifica se ha hit no boss
+//verifica se o ataque ja acabou
+void ataque_player(player *p, bool keys[], bool dev_mode, boss *b){
+	if(!p->jump && !p->crouch  && !p->recuo && p->attack == 0){ //verifica se o p1 pode atacar
+                if(keys[ALLEGRO_KEY_Z]){//ataque alto
+                        p->attack = 1;
+                        p->attack_done = false;
+                }
+                if(keys[ALLEGRO_KEY_X]){//ataque baixo
+                        p->attack = 2;
+                        p->attack_done = false;
+                }
+        } 
+	
+	int num;
+	//verifica hits dos ataques do p1
+        if(p->attack == 1){
+		num = 6;
+	} else if (p->attack == 2){
+		num = 7;
+	} else
+		return;
+	
+	if((p->sprite_atual < p->i_sprites[num] - 1) || b->recuo || b->attack != 0)
+                return;
+
+        //indica se houve um hit
+        bool acerto = false;
+
+        //atacando para esquerda
+        if(p->olha_esquerda && (b->x < p->x) && (b->x + b->side/2 > p->x - p->side/2 - p->attack_1[0]))
+                acerto = true;
+        else if(!p->olha_esquerda && (b->x > p->x) && (b->x - b->side/2 < p->x + p->side/2 + p->attack_1[0])) //atacando para direita
+                acerto = true;
+
+        if(acerto){
+                b->vida -= 50;
+                b->recuo = true;
+                b->attack = 0;
+	}
+
+}
+
+//verifica se o boss realiza um ataque, se sim verifica se ha hit no player
+//verifica se o ataque ja acabou
+void ataques_boss(player *p, bool keys[], bool hitbox, boss *b){
+
 }
 
 boss *cria_boss(display_info *disp){
@@ -216,11 +311,11 @@ boss *cria_boss(display_info *disp){
         aux->num_sprites = num_sprites;
         aux->i_sprites = indice_sprites;
         aux->attack = 0;
-        aux->attack_done = true;
         aux->tempo_ciclo = tempo_ciclo;
+	aux->recuo = false;
 
         //posicao horizontal inicial (ini_x% da tela)
-       aux->x = disp->tam_x * (90.0/100.0);
+       aux->x = disp->tam_x/2;
 
         //inicializa os players no chao)
         aux->y = disp->tam_y - disp->chao - aux->height/2;
@@ -230,6 +325,55 @@ boss *cria_boss(display_info *disp){
         return aux;
 }
 
+//verifica se o player ganhou ou perdeu o modo single player
+//realiza o encerramento dependendo se ganhou ou perdeu
+//reinicia o boss e o player se new game
+//sai do modo single player se main menu ou exit
+bool verifica_fim(player *p, boss *b, display_info *disp, ALLEGRO_TIMER *timer, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_BITMAP *background, bool keys[], ALLEGRO_FONT *font, bool *retorno){
+
+        //realiza a animacao de morte do player derrotadoou do boss 
+        //imprime o texto indicando se o player venceu ou perdeu
+	if(p->vida == 0)
+		single_derrota(p, b, font);
+	else if(b->vida == 0)
+		single_vitoria(p, b, font);
+	else
+		return false;
+	return true;
+/*
+        //cria o menu que sera usado no display
+        menus *m;
+        if(!(m = cria_menu(3)))
+                return false;
+
+        //cria as strings do menu
+        char fala1[] = "new_game.png";
+        char fala2[] = "menu.png";
+        char fala3[] = "quit.png";
+
+        //inicializa as strings do menu
+        m->strings[0] = fala1;
+        m->strings[1] = fala2;
+        m->strings[2] = fala3;
+
+        //inicializa os codigos
+        m->codes[0] = NEW_GAME;
+        m->codes[1] = MAIN_MENU;
+        m->codes[2] = EXIT_GAME;
+
+        //mostra o menu e realiza a operacao desejada pelo usuario
+        bool aux = display_menu(m, disp, queue, timer, p1, p2, keys, *background, single);
+
+        //destroi o menu apos o seu uso
+        destroy_menu(m);
+
+        return aux;
+}
+*/
+}
+
+void single_derrota(player *p, boss *b, ALLEGRO_FONT *font){}
+void single_vitoria(player *p, boss *b, ALLEGRO_FONT *font){}
 
 //destroi a struct do boss e todos os seus componentes
 void destroy_boss(boss *elem){

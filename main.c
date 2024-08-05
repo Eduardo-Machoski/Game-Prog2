@@ -118,11 +118,10 @@ int main(int argc, char *argv[]){
 			} else if(code == 42) //botao de fechar pressionado
 				encerra = true;
 		} else {
-			encerra = single_player(disp, queue, timer, &background, pressed_keys, &player_1, &single, dev_mode);
-
-			//caso o player saia do single player e queira jogar multiplayer
-			if(!encerra && !single)
-				selecao_personagem(disp, &player_1, &player_2, &background, queue, timer);
+			encerra = single_player(disp, queue, timer, &background, font, pressed_keys, &player_1, &single, dev_mode);
+			//menu principal apos sair do modo single player
+			if(!encerra)
+				encerra = main_menu(queue, disp, timer, true, &player_1, &player_2, pressed_keys, background, &single);
 		}
 	}
 

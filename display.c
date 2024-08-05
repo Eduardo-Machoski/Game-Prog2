@@ -175,9 +175,10 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 					retorno = main_menu(queue, disp, timer, true, p1, p2, keys, background, single);
 				else if(m->codes[atual] == BOSS)
 					*single = true;
-				else if(m->codes[atual] == NEW_GAME)
+				else if(m->codes[atual] == NEW_GAME || m->codes[atual] == START_GAME){
 					retorno = selecao_personagem(disp, p1, p2, &background, queue, timer);
-				else if(m->codes[atual] == EXIT_GAME)
+					*single = false;
+				}else if(m->codes[atual] == EXIT_GAME)
 					retorno = true;
 				continua = false;
 			}
@@ -203,6 +204,10 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 
 //imprime ambos os players na tela
 void imprime_players(player *p1, bool *keys, bool hitbox, bool pause, int player){
+	//player nao inicializado
+	if(!p1)
+		return;
+
 	if(hitbox){
 	//imprime hitbox
 		al_draw_rectangle(p1->x - p1->side / 2, p1->y - p1->height/2, p1->x + p1->side/2, p1->y + p1->height/2, al_map_rgb(0, 0, 255), 0);
@@ -293,25 +298,6 @@ void imprime_stamina(display_info *disp, player *p1, player *p2, bool adiciona){
 
 }
 
-//imprime a barra de stamina do playe1r
-//aumenta a stamina atual dos players a cada 2 ciclos do timer
-void imprime_stamina_single(display_info *disp, player *p1, bool adiciona){
-	
-	//valores utilizados na impressao (melhora performance)
-	int disp_3 = disp->tam_x/3;
-	int disp_15 = disp->tam_x/10;
-	int disp_12_y = disp->tam_y/12 * 2 - disp->tam_y/25;
-	int disp_30_y = disp->tam_y/30 + disp->tam_y/12 - disp->tam_y/50;
-
-	//stamina do player1
-	al_draw_filled_rectangle(disp_15 - 2, disp_30_y, disp_3 + 2, disp_12_y, al_map_rgb(255, 255, 255));
-	al_draw_filled_rectangle(disp_15, disp_30_y + 1, disp_15 + (disp_3 - disp_15) * p1->stamina/100.0, disp_12_y - 1, al_map_rgb(255, 127, 80));
-
-	//aumenta um pouco a stamina do player caso nao esteja cheia
-	if(adiciona && p1->stamina < 100)
-		p1->stamina += 1;
-}
-
 //imprime a barra de vida de ambos os players
 void imprime_vida(display_info *disp, player *p1, player *p2){
 
@@ -328,6 +314,20 @@ void imprime_vida(display_info *disp, player *p1, player *p2){
 	//vida do player2
 	al_draw_filled_rectangle(2 * disp_3 - 2, disp_30_y, disp->tam_x - disp_15 + 2, disp_12_y, al_map_rgb(255, 255, 255));
 	al_draw_filled_rectangle(2 * disp_3 + (disp ->tam_x - disp_15 - 2 * disp_3) * (1.0 - p2->vida/100.0), disp_30_y + 1, disp->tam_x - disp_15, disp_12_y - 1, al_map_rgb(255, 0, 0));
+}
+
+//imprime a barra de vida de ambos os players
+void imprime_vida_boss(display_info *disp, boss *b){
+
+	//valores utilizados na impressao (melhora performance)
+	int disp_3 = disp->tam_x/3;
+	int disp_15 = disp->tam_x/15;
+	int disp_12_y = disp->tam_y/12;
+	int disp_30_y = disp->tam_y/30;
+
+	//vida do boss
+	al_draw_filled_rectangle(2 * disp_3 - 2, disp_30_y, disp->tam_x - disp_15 + 2, disp_12_y, al_map_rgb(255, 255, 255));
+	al_draw_filled_rectangle(2 * disp_3 + (disp ->tam_x - disp_15 - 2 * disp_3) * (1.0 - b->vida/100.0), disp_30_y + 1, disp->tam_x - disp_15, disp_12_y - 1, al_map_rgb(255, 0, 0));
 }
 
 //imprime a barra de vida do player1

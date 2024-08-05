@@ -41,12 +41,11 @@ void imprime_background(ALLEGRO_BITMAP *background, display_info *disp);
 //aumenta a stamina atual dos players a cada 2 ciclos do timer 
 void imprime_stamina(display_info *disp, player *p1, player *p2, bool adiciona);
 
-//imprime a barra de stamina do player1
-//aumenta a stamina atual dos players a cada 2 ciclos do timer 
-void imprime_stamina_single(display_info *disp, player *p1, bool adiciona);
-
 //imprime a barra de vida de ambos os players
 void imprime_vida(display_info *disp, player *p1, player *p2);
+
+//imprime a barra de vida do boss
+void imprime_vida_boss(display_info *disp, boss *b);
 
 //imprime a barra de vida do player1
 void imprime_vida_single(display_info *disp, player *p1);

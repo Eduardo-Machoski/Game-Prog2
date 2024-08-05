@@ -62,7 +62,7 @@ bool single_player(display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER
 				ciclo_atual = (ciclo_atual + 1) % 101;
 
 			//verifica se o player ganhou ou perdeu
-			encerra = verifica_fim(*p, inimigo, disp, timer, queue, *background, keys, font, &retorno);
+			encerra = verifica_fim(*p, inimigo, disp, timer, queue, *background, keys, font, &retorno, single);
 		} else if(code == 10){ //tecla pressionada
 			//atualiza o controle de movimento dos personagens
 			keys[event.keyboard.keycode] = 1;
@@ -329,7 +329,7 @@ boss *cria_boss(display_info *disp){
 //realiza o encerramento dependendo se ganhou ou perdeu
 //reinicia o boss e o player se new game
 //sai do modo single player se main menu ou exit
-bool verifica_fim(player *p, boss *b, display_info *disp, ALLEGRO_TIMER *timer, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_BITMAP *background, bool keys[], ALLEGRO_FONT *font, bool *retorno){
+bool verifica_fim(player *p, boss *b, display_info *disp, ALLEGRO_TIMER *timer, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_BITMAP *background, bool keys[], ALLEGRO_FONT *font, bool *retorno, bool *single){
 
         //realiza a animacao de morte do player derrotadoou do boss 
         //imprime o texto indicando se o player venceu ou perdeu
@@ -339,9 +339,8 @@ bool verifica_fim(player *p, boss *b, display_info *disp, ALLEGRO_TIMER *timer, 
 		single_vitoria(p, b, font);
 	else
 		return false;
-	return true;
-/*
-        //cria o menu que sera usado no display
+        
+	//cria o menu que sera usado no display
         menus *m;
         if(!(m = cria_menu(3)))
                 return false;
@@ -362,14 +361,13 @@ bool verifica_fim(player *p, boss *b, display_info *disp, ALLEGRO_TIMER *timer, 
         m->codes[2] = EXIT_GAME;
 
         //mostra o menu e realiza a operacao desejada pelo usuario
-        bool aux = display_menu(m, disp, queue, timer, p1, p2, keys, *background, single);
+        *retorno = display_menu_single(m, disp, queue, timer, p, b, keys, background, single);
+
 
         //destroi o menu apos o seu uso
         destroy_menu(m);
 
-        return aux;
-}
-*/
+        return true;
 }
 
 void single_derrota(player *p, boss *b, ALLEGRO_FONT *font){}

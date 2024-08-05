@@ -202,6 +202,105 @@ bool display_menu(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLE
 	return retorno;
 }
 
+
+//imprime um menu na tela e obtem inputs do usuario para realizar as operaçoes disponiveis em cada menu
+bool display_menu_single(menus *m, display_info *disp, ALLEGRO_EVENT_QUEUE *queue, ALLEGRO_TIMER *timer, player *p, boss *b, bool keys[], ALLEGRO_BITMAP *background, bool *single){
+
+	//para os ticks do timer enquanto o menu estiver aberto
+	al_stop_timer(timer);
+
+
+	ALLEGRO_EVENT event;
+
+	//controle de qual opcao do menu o usuario esta atualmente selecionando
+	int atual = 0;
+
+	//retorno da funcao
+	bool retorno = false;
+
+	//controle de continuacao do menu
+	bool continua = true;
+	
+	//indica a sprite a ser aberta
+	char *sprite = malloc(sizeof(char) * 1000);
+	ALLEGRO_BITMAP *button = NULL;
+
+	while(continua){
+		if(background != NULL){
+			imprime_background(background, disp);
+			imprime_players(p, keys, false, true, 1);
+			imprime_boss(b, false);
+		}
+		//imprime as opçoes do menu
+		for(int i = 0; i < m->opcoes; i++){
+			sprite[0] = '\0';
+			strcat(sprite, "Sprites/Menu/");
+			if(i == atual){ //opçao atualmente selecionada
+				strcat(sprite, "Collored_Buttons/");
+				strcat(sprite, m->strings[i]);
+			} else{
+				strcat(sprite, "Buttons/");
+				strcat(sprite, m->strings[i]);
+			}
+
+			//obtem a sprite do botao sendo impresso atualmente
+			button = al_load_bitmap(sprite);
+			if(!button){
+				exit(1);
+			}
+
+
+			//imprime os botoes em escala
+			if(m->codes[i] != BOSS)
+				al_draw_scaled_bitmap(button, 0, 0, 600, 200, disp->tam_x/3, disp->tam_y/5 * (i + 1), disp->tam_x/3, disp->tam_y/6, ALLEGRO_MIN_LINEAR);	
+			else
+				al_draw_scaled_bitmap(button, 0, 0, 55, 57, 4 * disp->tam_x/9, disp->tam_y/5 * (i + 1), disp->tam_y/6, disp->tam_y/6, ALLEGRO_MIN_LINEAR);
+			
+			//destroi o bitmap do botao
+			al_destroy_bitmap(button);
+		}
+
+		//atualiza a tela
+		al_flip_display();
+
+		//espera e obtem input do usuario
+		al_wait_for_event(queue, &event);
+		if(event.type == 10){
+			if(event.keyboard.keycode == 59) //pressiona 'esc' e fecha o menu de pause
+				continua = false;
+			else if (event.keyboard.keycode == 85) //pressiona o botao para baixo
+				atual = (atual + 1) % m->opcoes;
+			else if (event.keyboard.keycode == 84) //pressiona o botao para cima
+				atual = (atual - 1 + m->opcoes) % m->opcoes;
+			else if (event.keyboard.keycode == 67)
+			{//pressiona 'ENTER'
+				if(m->codes[atual] == MAIN_MENU){
+					retorno = false;
+					*single = false;
+				}
+				else if(m->codes[atual] == EXIT_GAME)
+					retorno = true;
+				continua = false;
+			}
+			keys[event.keyboard.keycode] = keys[event.keyboard.keycode] ^ 1;
+		} else if (event.type == 12)
+			keys[event.keyboard.keycode] = keys[event.keyboard.keycode] ^ 1;
+	}
+
+	//atualiza as teclas apertadas e soltas durante o menu
+	while(!al_is_event_queue_empty(queue)){
+		al_get_next_event(queue, &event);
+		if(event.type == 10 || event.type == 12)
+		keys[event.keyboard.keycode] = keys[event.keyboard.keycode] ^ 1;
+	}
+
+	//destoi a string auxiliar sprite
+	free(sprite);
+
+	//retoma os ticks do timer
+	al_start_timer(timer);
+	return retorno;
+}
 //imprime ambos os players na tela
 void imprime_players(player *p1, bool *keys, bool hitbox, bool pause, int player){
 	//player nao inicializado
